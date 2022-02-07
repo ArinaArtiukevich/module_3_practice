@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':service')
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.2.19.RELEASE'
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.2.19.RELEASE'
+    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    implementation group: 'org.hibernate', name: 'hibernate-validator', version: '6.2.1.Final'
+    implementation 'org.glassfish:jakarta.el:4.0.2'
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
+}

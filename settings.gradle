@@ -1,0 +1,5 @@
+rootProject.name = 'module_3_practice'
+include 'service'
+include 'dao'
+include 'controller'
+
