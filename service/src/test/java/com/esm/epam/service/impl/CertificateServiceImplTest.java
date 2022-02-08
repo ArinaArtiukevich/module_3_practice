@@ -1,9 +1,10 @@
-package epam.service.impl;
+package com.esm.epam.service.impl;
 
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
 import com.esm.epam.repository.impl.CertificateDaoImpl;
+import com.esm.epam.repository.impl.CertificateQueryBuilderImpl;
 import com.esm.epam.service.impl.CertificateServiceImpl;
 import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.impl.ServiceCertificateValidatorImpl;
@@ -16,6 +17,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
@@ -30,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
-@ContextConfiguration(locations = "classpath:testSpringDispetcher-servlet.xml")
+@ContextConfiguration
 @ExtendWith(SpringExtension.class)
 class CertificateServiceImplTest {
 

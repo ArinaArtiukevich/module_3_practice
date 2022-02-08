@@ -8,14 +8,12 @@ import com.esm.epam.mapper.TagMapper;
 import com.esm.epam.repository.CRUDDao;
 import com.esm.epam.repository.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.MultiValueMap;
 
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -42,14 +40,13 @@ import static com.esm.epam.util.ParameterAttribute.TAG;
 
 @Repository
 public class CertificateDaoImpl implements CRUDDao<Certificate> {
-
+    @Autowired
     private QueryBuilder<Certificate> queryBuilder;
+    @Autowired
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    public CertificateDaoImpl(@Qualifier("dataSource") DataSource dataSource, QueryBuilder<Certificate> queryBuilder) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-        this.queryBuilder = queryBuilder;
+    public CertificateDaoImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override

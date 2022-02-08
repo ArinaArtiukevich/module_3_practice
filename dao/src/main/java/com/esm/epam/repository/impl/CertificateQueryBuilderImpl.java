@@ -45,7 +45,6 @@ import static com.esm.epam.util.ParameterAttribute.WHERE_UPDATE_QUERY;
 
 
 @Component
-@ComponentScan(basePackages = {"com.esm.epam.repository.impl"})
 @Qualifier(value = "certificateQueryBuilder")
 public class CertificateQueryBuilderImpl implements QueryBuilder<Certificate> {
 

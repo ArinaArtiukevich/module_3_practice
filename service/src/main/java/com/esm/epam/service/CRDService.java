@@ -1,6 +1,7 @@
 package com.esm.epam.service;
 
 import com.esm.epam.exception.DaoException;
+import com.esm.epam.exception.ResourceNotFoundException;
 import org.springframework.util.MultiValueMap;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public interface CRDService<T> {
      * @return List with values
      */
 
-    List<T> getAll() throws com.esm.epam.exception.ResourceNotFoundException;
+    List<T> getAll() throws ResourceNotFoundException;
 
     /**
      * gets filtered values
@@ -25,7 +26,7 @@ public interface CRDService<T> {
      *               key and {@link Object} as value
      * @return List with sorted values
      */
-    default List<T> getFilteredList(MultiValueMap<String, Object> params) throws com.esm.epam.exception.ResourceNotFoundException {
+    default List<T> getFilteredList(MultiValueMap<String, Object> params) throws ResourceNotFoundException {
         return getAll();
     }
 
@@ -43,7 +44,7 @@ public interface CRDService<T> {
      * @param id is required element id
      * @return required element
      */
-    T getById(Long id) throws com.esm.epam.exception.ResourceNotFoundException, DaoException;
+    T getById(Long id) throws ResourceNotFoundException, DaoException;
 
     /**
      * deletes element by id
@@ -51,5 +52,5 @@ public interface CRDService<T> {
      * @param id is required element id
      * @return true when element was deleted
      */
-    boolean deleteById(Long id) throws com.esm.epam.exception.ResourceNotFoundException;
+    boolean deleteById(Long id) throws ResourceNotFoundException;
 }

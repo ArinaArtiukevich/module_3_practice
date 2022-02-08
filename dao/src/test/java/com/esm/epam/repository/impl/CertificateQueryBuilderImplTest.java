@@ -3,14 +3,23 @@ package com.esm.epam.repository.impl;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.repository.QueryBuilder;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SpringBootTest
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = CertificateQueryBuilderImpl.class)
 class CertificateQueryBuilderImplTest {
 
-    private QueryBuilder<Certificate> queryBuilder = new CertificateQueryBuilderImpl();
+    @Autowired
+    private QueryBuilder<Certificate> queryBuilder;
 
     @Test
     void getUpdateQuery() {

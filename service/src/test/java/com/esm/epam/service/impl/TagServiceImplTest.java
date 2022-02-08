@@ -1,4 +1,4 @@
-package epam.service.impl;
+package com.esm.epam.service.impl;
 
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -23,7 +24,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ContextConfiguration(locations = "classpath:testSpringDispetcher-servlet.xml")
+@ContextConfiguration
 @ExtendWith(SpringExtension.class)
 class TagServiceImplTest {
     @Mock

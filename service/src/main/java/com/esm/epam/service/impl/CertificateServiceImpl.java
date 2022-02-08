@@ -2,6 +2,7 @@ package com.esm.epam.service.impl;
 
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.exception.DaoException;
+import com.esm.epam.exception.ResourceNotFoundException;
 import com.esm.epam.repository.CRUDDao;
 import com.esm.epam.service.CRUDService;
 import com.esm.epam.util.CurrentDate;
@@ -25,7 +26,7 @@ public class CertificateServiceImpl implements CRUDService<Certificate> {
     private CurrentDate date;
 
     @Override
-    public Optional<Certificate> update(Certificate certificate, Long idCertificate) throws DaoException, com.esm.epam.exception.ResourceNotFoundException {
+    public Optional<Certificate> update(Certificate certificate, Long idCertificate) throws DaoException, ResourceNotFoundException {
         Optional<List<Certificate>> certificates = certificateDao.getAll();
         Optional<Certificate> updatedCertificate = Optional.empty();
         validator.validateListIsNull(certificates);
@@ -41,7 +42,7 @@ public class CertificateServiceImpl implements CRUDService<Certificate> {
     }
 
     @Override
-    public List<Certificate> getAll() throws com.esm.epam.exception.ResourceNotFoundException {
+    public List<Certificate> getAll() throws ResourceNotFoundException {
         Optional<List<Certificate>> certificates = certificateDao.getAll();
         validator.validateListIsNull(certificates);
         return certificates.get();
@@ -54,7 +55,7 @@ public class CertificateServiceImpl implements CRUDService<Certificate> {
     }
 
     @Override
-    public Certificate getById(Long id) throws com.esm.epam.exception.ResourceNotFoundException, DaoException {
+    public Certificate getById(Long id) throws ResourceNotFoundException, DaoException {
         Optional<Certificate> certificate = certificateDao.getById(id);
         validator.validateEntity(certificate, id);
         return certificate.get();
@@ -66,7 +67,7 @@ public class CertificateServiceImpl implements CRUDService<Certificate> {
     }
 
     @Override
-    public List<Certificate> getFilteredList(MultiValueMap<String, Object> params) throws com.esm.epam.exception.ResourceNotFoundException {
+    public List<Certificate> getFilteredList(MultiValueMap<String, Object> params) throws ResourceNotFoundException {
         Optional<List<Certificate>> certificates = certificateDao.getFilteredList(params);
         validator.validateListIsNull(certificates);
         return certificates.get();

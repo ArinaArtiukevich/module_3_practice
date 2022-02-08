@@ -5,8 +5,13 @@ import com.esm.epam.config.HsqlConfiguration;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
-import com.esm.epam.repository.QueryBuilder;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -18,11 +23,13 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
+@ContextConfiguration(classes = {CertificateQueryBuilderImpl.class, CertificateDaoImpl.class, HsqlConfiguration.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class CertificateDaoImplTest {
-
-    private HsqlConfiguration hsqlConfiguration = new HsqlConfiguration();
-    private QueryBuilder<Certificate> queryBuilder = new CertificateQueryBuilderImpl();
-    private CertificateDaoImpl certificateDao = new CertificateDaoImpl(hsqlConfiguration.hsqlDataSource(), queryBuilder);
+    @Autowired
+    private CertificateDaoImpl certificateDao;
 
     private Tag tag_winter = new Tag(1L, "tag_winter");
     private Tag tag_relax = new Tag(2L, "tag_relax");

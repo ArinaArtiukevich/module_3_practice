@@ -5,13 +5,11 @@ import com.esm.epam.exception.DaoException;
 import com.esm.epam.mapper.TagMapper;
 import com.esm.epam.repository.CRDDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
@@ -28,11 +26,11 @@ import static com.esm.epam.util.ParameterAttribute.TAG_ID;
 
 @Repository
 public class TagDaoImpl implements CRDDao<Tag> {
+    @Autowired
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    public TagDaoImpl(@Qualifier("dataSource") DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    public TagDaoImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override

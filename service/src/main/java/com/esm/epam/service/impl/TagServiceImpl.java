@@ -2,6 +2,7 @@ package com.esm.epam.service.impl;
 
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
+import com.esm.epam.exception.ResourceNotFoundException;
 import com.esm.epam.repository.CRDDao;
 import com.esm.epam.service.CRDService;
 import com.esm.epam.validator.ServiceValidator;
@@ -20,7 +21,7 @@ public class TagServiceImpl implements CRDService<Tag> {
     private ServiceValidator<Tag> validator;
 
     @Override
-    public List<Tag> getAll() throws com.esm.epam.exception.ResourceNotFoundException {
+    public List<Tag> getAll() throws ResourceNotFoundException {
         Optional<List<Tag>> tags = tagDao.getAll();
         validator.validateListIsNull(tags);
         return tags.get();
@@ -33,7 +34,7 @@ public class TagServiceImpl implements CRDService<Tag> {
     }
 
     @Override
-    public Tag getById(Long id) throws com.esm.epam.exception.ResourceNotFoundException, DaoException {
+    public Tag getById(Long id) throws ResourceNotFoundException, DaoException {
         Optional<Tag> tag = tagDao.getById(id);
         validator.validateEntity(tag, id);
         return tag.get();

@@ -1,17 +1,26 @@
-package epam.validator.impl;
+package com.esm.epam.validator.impl;
 
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.ResourceNotFoundException;
 import com.esm.epam.validator.impl.ServiceTagValidatorImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.Optional;
 
+@SpringBootTest
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = ServiceTagValidatorImpl.class)
 class ServiceTagValidatorImplTest {
 
-    private ServiceTagValidatorImpl tagValidator = new ServiceTagValidatorImpl();
+    @Autowired
+    private ServiceTagValidatorImpl tagValidator;
     private Tag tag = new Tag(1L, "tag_winter");
 
     @Test
