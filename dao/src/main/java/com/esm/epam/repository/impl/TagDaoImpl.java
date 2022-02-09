@@ -34,8 +34,8 @@ public class TagDaoImpl implements CRDDao<Tag> {
     }
 
     @Override
-    public Optional<List<Tag>> getAll() {
-        return Optional.of(jdbcTemplate.query(GET_ALL_TAGS_QUERY, new TagMapper()));
+    public Optional<List<Tag>> getAll(int page, int size) {
+        return Optional.of(jdbcTemplate.query(GET_ALL_TAGS_QUERY, new TagMapper(), size, page));
     }
 
     @Override

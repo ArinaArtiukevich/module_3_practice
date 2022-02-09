@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class CertificateServiceImpl implements CRUDService<Certificate> {
-
     @Autowired
     private CRUDDao<Certificate> certificateDao;
     @Autowired
@@ -27,23 +26,20 @@ public class CertificateServiceImpl implements CRUDService<Certificate> {
 
     @Override
     public Optional<Certificate> update(Certificate certificate, Long idCertificate) throws DaoException, ResourceNotFoundException {
-        Optional<List<Certificate>> certificates = certificateDao.getAll();
+        Optional<Certificate> certificateBeforeUpdate = certificateDao.getById(idCertificate);
         Optional<Certificate> updatedCertificate = Optional.empty();
-        validator.validateListIsNull(certificates);
-        validator.validateListIsEmpty(certificates.get());
-        List<Long> certificatesId = certificates.get().stream()
-                .map(Certificate::getId)
-                .collect(Collectors.toList());
-        if (certificatesId.contains(idCertificate)) {
+        if (certificateBeforeUpdate.isPresent()) {
             certificate.setLastUpdateDate(date.getCurrentDate());
             updatedCertificate = certificateDao.update(certificate, idCertificate);
+        } else {
+            throw new ResourceNotFoundException("No such certificate");
         }
         return updatedCertificate;
     }
 
     @Override
-    public List<Certificate> getAll() throws ResourceNotFoundException {
-        Optional<List<Certificate>> certificates = certificateDao.getAll();
+    public List<Certificate> getAll(int page, int size) throws ResourceNotFoundException {
+        Optional<List<Certificate>> certificates = certificateDao.getAll(page, size);
         validator.validateListIsNull(certificates);
         return certificates.get();
     }
@@ -67,8 +63,8 @@ public class CertificateServiceImpl implements CRUDService<Certificate> {
     }
 
     @Override
-    public List<Certificate> getFilteredList(MultiValueMap<String, Object> params) throws ResourceNotFoundException {
-        Optional<List<Certificate>> certificates = certificateDao.getFilteredList(params);
+    public List<Certificate> getFilteredList(MultiValueMap<String, Object> params, int page, int size) throws ResourceNotFoundException {
+        Optional<List<Certificate>> certificates = certificateDao.getFilteredList(params, page, size);
         validator.validateListIsNull(certificates);
         return certificates.get();
     }

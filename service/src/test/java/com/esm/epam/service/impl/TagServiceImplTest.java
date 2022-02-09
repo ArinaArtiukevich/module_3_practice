@@ -53,8 +53,8 @@ class TagServiceImplTest {
 
     @Test
     public void testGetAll_positive() throws ResourceNotFoundException {
-        when(tagDao.getAll()).thenReturn(Optional.ofNullable(tags));
-        List<Tag> actualTags = tagService.getAll();
+        when(tagDao.getAll(1, 1000)).thenReturn(Optional.ofNullable(tags));
+        List<Tag> actualTags = tagService.getAll(1, 100);
         assertEquals(tags, actualTags);
     }
 

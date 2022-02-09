@@ -51,7 +51,7 @@ public class ParameterAttribute {
     public final static String DELETE_TAG_BY_TAG_ID_AND_CERTIFICATE_ID_QUERY = "DELETE FROM certificates_tags\n" +
             "    WHERE (certificates_tags.certificate_id = ?) AND (certificates_tags.tag_id = ?);\n";
 
-    public final static String GET_ALL_TAGS_QUERY = "SELECT * FROM tags";
+    public final static String GET_ALL_TAGS_QUERY = "SELECT * FROM tags ORDER BY tag_id LIMIT ? OFFSET ?";
     public final static String GET_TAG_BY_ID_QUERY = "SELECT * FROM tags WHERE tags.tag_id = ?";
     public final static String ADD_TAG_QUERY = "INSERT INTO tags(tag_name) VALUES (?)";
     public final static String DELETE_TAG_BY_ID_QUERY = " DELETE FROM tags WHERE tags.tag_id = ?";

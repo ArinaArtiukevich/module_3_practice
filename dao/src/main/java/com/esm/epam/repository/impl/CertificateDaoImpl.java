@@ -50,17 +50,16 @@ public class CertificateDaoImpl implements CRUDDao<Certificate> {
     }
 
     @Override
-    public Optional<List<Certificate>> getAll() {
-        return Optional.ofNullable(jdbcTemplate.query(GET_ALL_CERTIFICATES_QUERY, new CertificateExtractor()));
+    public Optional<List<Certificate>> getAll(int page, int size) {
+        return getCertificates(page, size, GET_ALL_CERTIFICATES_QUERY);
     }
 
     @Override
-    public Optional<List<Certificate>> getFilteredList(MultiValueMap<String, Object> params) {
+    public Optional<List<Certificate>> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
         if (params.containsKey(TAG)) {
             params.replace(TAG, Collections.singletonList(jdbcTemplate.queryForObject(GET_TAG_BY_NAME_QUERY, new TagMapper(), params.get(TAG).get(0)).getId()));
         }
-        String filteredListQuery = queryBuilder.getFilteredList(params);
-        return Optional.ofNullable(jdbcTemplate.query(filteredListQuery, new CertificateExtractor()));
+        return getCertificates(page, size, queryBuilder.getFilteredList(params));
     }
 
     @Override
@@ -130,6 +129,19 @@ public class CertificateDaoImpl implements CRUDDao<Certificate> {
             certificate = getById(id);
         }
         return certificate;
+    }
+
+    private Optional<List<Certificate>> getCertificates(int page, int size, String query) {
+        Optional<List<Certificate>> filteredCertificates = Optional.empty();
+        Optional<List<Certificate>> allCertificates = Optional.ofNullable(jdbcTemplate.query(query, new CertificateExtractor()));
+        if (allCertificates.isPresent() && allCertificates.get().size() > page) {
+            if (allCertificates.get().size() >= page + size) {
+                filteredCertificates = Optional.of(allCertificates.get().subList(page, page + size));
+            } else {
+                filteredCertificates = Optional.of(allCertificates.get().subList(page, allCertificates.get().size()));
+            }
+        }
+        return filteredCertificates;
     }
 
     private void updateCertificateTags(long certificateId, List<Tag> tags) throws DaoException {

@@ -17,7 +17,7 @@ public interface CRDService<T> {
      * @return List with values
      */
 
-    List<T> getAll() throws ResourceNotFoundException;
+    List<T> getAll(int page, int size) throws ResourceNotFoundException;
 
     /**
      * gets filtered values
@@ -26,8 +26,8 @@ public interface CRDService<T> {
      *               key and {@link Object} as value
      * @return List with sorted values
      */
-    default List<T> getFilteredList(MultiValueMap<String, Object> params) throws ResourceNotFoundException {
-        return getAll();
+    default List<T> getFilteredList(MultiValueMap<String, Object> params, int page, int size) throws ResourceNotFoundException {
+        return getAll(page, size);
     }
 
     /**

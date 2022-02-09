@@ -40,15 +40,15 @@ public class CertificateController {
     @Autowired
     public CRUDService<Certificate> certificateService;
 
-    @GetMapping
+    @GetMapping(params = { "page", "size" })
     @JsonView(View.UI.class)
-    public ResponseEntity<List<Certificate>> getCertificateList(@RequestParam(required = false) MultiValueMap<String, Object> params) throws ResourceNotFoundException, ControllerException {
+    public ResponseEntity<List<Certificate>> getCertificateList(@RequestParam(required = false) MultiValueMap<String, Object> params, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) throws ResourceNotFoundException, ControllerException {
         List<Certificate> certificates = new ArrayList<>();
-        if (params.size() == 0) {
-            certificates = certificateService.getAll();
+        if (params.size() == 2) {
+            certificates = certificateService.getAll(page, size);
         } else {
             validateSortValues(params);
-            certificates = certificateService.getFilteredList(params);
+            certificates = certificateService.getFilteredList(params, page, size);
         }
         return new ResponseEntity<>(certificates, HttpStatus.OK);
     }
