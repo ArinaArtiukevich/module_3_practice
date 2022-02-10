@@ -6,7 +6,7 @@ import com.esm.epam.exception.DaoException;
 import com.esm.epam.extractor.CertificateExtractor;
 import com.esm.epam.mapper.TagMapper;
 import com.esm.epam.repository.CRUDDao;
-import com.esm.epam.repository.QueryBuilder;
+import com.esm.epam.builder.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;

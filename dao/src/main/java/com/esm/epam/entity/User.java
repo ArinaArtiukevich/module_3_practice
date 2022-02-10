@@ -10,16 +10,11 @@ import javax.validation.constraints.NotBlank;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tag {
+public class User {
     @JsonView(View.UI.class)
     private Long id;
 
     @JsonView(View.UI.class)
-    @NotBlank(message = "Tag name should not be empty.")
-    private String name;
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return new Tag(this.getId(), this.getName());
-    }
+    @NotBlank(message = "Login should not be empty.")
+    private String login;
 }

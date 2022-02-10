@@ -1,10 +1,9 @@
-package com.esm.epam.repository.impl;
+package com.esm.epam.builder.impl;
 
+import com.esm.epam.builder.QueryBuilder;
 import com.esm.epam.entity.Certificate;
-import com.esm.epam.repository.QueryBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 

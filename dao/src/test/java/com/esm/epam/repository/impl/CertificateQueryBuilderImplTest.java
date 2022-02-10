@@ -1,7 +1,8 @@
 package com.esm.epam.repository.impl;
 
+import com.esm.epam.builder.QueryBuilder;
+import com.esm.epam.builder.impl.CertificateQueryBuilderImpl;
 import com.esm.epam.entity.Certificate;
-import com.esm.epam.repository.QueryBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

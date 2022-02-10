@@ -6,6 +6,10 @@ public class ParameterAttribute {
     public final static String DATABASE_USERNAME = "postgres";
     public final static String DATABASE_PASSWORD = "root";
 
+    public final static String USER_TABLE = "users";
+    public final static String USER_ID = "user_id";
+    public final static String USER_LOGIN = "user_login";
+
     public final static String TAG_TABLE = "tags";
     public final static String TAG = "tag";
     public final static String TAG_ID = "tag_id";
@@ -56,6 +60,8 @@ public class ParameterAttribute {
     public final static String ADD_TAG_QUERY = "INSERT INTO tags(tag_name) VALUES (?)";
     public final static String DELETE_TAG_BY_ID_QUERY = " DELETE FROM tags WHERE tags.tag_id = ?";
     public final static String DELETE_TAG_BY_ID_CERTIFICATES_TAG_QUERY = "DELETE FROM certificates_tags WHERE certificates_tags.tag_id = ?;";
+
+    public final static String GET_ALL_USERS_QUERY = "SELECT * FROM users ORDER BY user_id LIMIT ? OFFSET ?";
 
     public final static String BEGIN_GET_FILTERED_CERTIFICATE_LIST_QUERY = "SELECT * FROM gift_certificates \n" +
             "LEFT JOIN certificates_tags ON (gift_certificates.id=certificates_tags.certificate_id) \n" +

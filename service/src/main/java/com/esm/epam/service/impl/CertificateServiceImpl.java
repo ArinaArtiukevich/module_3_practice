@@ -13,14 +13,13 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CertificateServiceImpl implements CRUDService<Certificate> {
     @Autowired
     private CRUDDao<Certificate> certificateDao;
     @Autowired
-    private ServiceValidator<Certificate> validator;
+    private ServiceValidator<Certificate> validator; // todo
     @Autowired
     private CurrentDate date;
 
