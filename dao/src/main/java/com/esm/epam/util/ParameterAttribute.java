@@ -9,6 +9,7 @@ public class ParameterAttribute {
     public final static String USER_TABLE = "users";
     public final static String USER_ID = "user_id";
     public final static String USER_LOGIN = "user_login";
+    public final static String USER_PART_NAME_FIELDS = "user_";
 
     public final static String TAG_TABLE = "tags";
     public final static String TAG = "tag";
@@ -29,9 +30,16 @@ public class ParameterAttribute {
     public final static String CERTIFICATE_TAGS_CERTIFICATE_ID = "certificate_id";
     public final static String CERTIFICATE_TAGS_TAG_ID = "tag_id";
 
-    public final static String BEGIN_UPDATE_QUERY = "UPDATE gift_certificates SET ";
-    public final static String WHERE_UPDATE_QUERY = " WHERE gift_certificates.id = ";
+    public final static String BEGIN_CERTIFICATE_UPDATE_QUERY = "UPDATE gift_certificates SET ";
+    public final static String WHERE_CERTIFICATE_UPDATE_QUERY = " WHERE gift_certificates.id = ";
 
+    public final static String BEGIN_USER_UPDATE_QUERY = "UPDATE users SET ";
+    public final static String WHERE_USER_UPDATE_QUERY = " WHERE users.user_id = ";
+
+    public final static String GET_CERTIFICATE_BY_NAME_QUERY = "SELECT * FROM gift_certificates \n" +
+            "LEFT JOIN certificates_tags ON (gift_certificates.id=certificates_tags.certificate_id) \n" +
+            "LEFT JOIN tags ON(tags.tag_id = certificates_tags.tag_id)\n" +
+            "WHERE gift_certificates.name = ?\n";
     public final static String GET_ALL_CERTIFICATES_QUERY = "SELECT * FROM gift_certificates \n" +
             "LEFT JOIN certificates_tags ON (gift_certificates.id=certificates_tags.certificate_id) \n" +
             "LEFT JOIN tags ON (tags.tag_id = certificates_tags.tag_id)\n" +
@@ -61,7 +69,20 @@ public class ParameterAttribute {
     public final static String DELETE_TAG_BY_ID_QUERY = " DELETE FROM tags WHERE tags.tag_id = ?";
     public final static String DELETE_TAG_BY_ID_CERTIFICATES_TAG_QUERY = "DELETE FROM certificates_tags WHERE certificates_tags.tag_id = ?;";
 
-    public final static String GET_ALL_USERS_QUERY = "SELECT * FROM users ORDER BY user_id LIMIT ? OFFSET ?";
+    public final static String GET_ALL_USERS_QUERY = "SELECT * FROM users \n" +
+            "LEFT JOIN users_certificates ON (users.user_id=users_certificates.user_id) \n" +
+            "LEFT JOIN gift_certificates ON (gift_certificates.id = users_certificates.certificate_id)\n" +
+            "LEFT JOIN certificates_tags ON (gift_certificates.id=certificates_tags.certificate_id) \n" +
+            "LEFT JOIN tags ON (tags.tag_id = certificates_tags.tag_id) \n" +
+            "ORDER BY users.user_id";
+    public final static String GET_USER_CERTIFICATES = "SELECT users_certificates.certificate_id FROM users_certificates WHERE users_certificates.user_id = ?\n";
+    public final static String ADD_USER_CERTIFICATE_QUERY = "INSERT INTO users_certificates(user_id, certificate_id) VALUES (?,?)";
+    public final static String GET_USER_BY_ID_QUERY = "SELECT * FROM users \n" +
+            "LEFT JOIN users_certificates ON (users.user_id=users_certificates.user_id) \n" +
+            "LEFT JOIN gift_certificates ON (gift_certificates.id = users_certificates.certificate_id)\n" +
+            "LEFT JOIN certificates_tags ON (gift_certificates.id=certificates_tags.certificate_id) \n" +
+            "LEFT JOIN tags ON (tags.tag_id = certificates_tags.tag_id) \n" +
+            "WHERE  users.user_id=?";
 
     public final static String BEGIN_GET_FILTERED_CERTIFICATE_LIST_QUERY = "SELECT * FROM gift_certificates \n" +
             "LEFT JOIN certificates_tags ON (gift_certificates.id=certificates_tags.certificate_id) \n" +

@@ -1,6 +1,7 @@
 package com.esm.epam.builder.impl;
 
-import com.esm.epam.builder.QueryBuilder;
+import com.esm.epam.builder.FilterQueryBuilder;
+import com.esm.epam.builder.UpdateQueryBuilder;
 import com.esm.epam.entity.Certificate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,8 +16,8 @@ import java.util.stream.Collectors;
 
 import static com.esm.epam.util.ParameterAttribute.AND_STATEMENT;
 import static com.esm.epam.util.ParameterAttribute.ASC_STATEMENT;
+import static com.esm.epam.util.ParameterAttribute.BEGIN_CERTIFICATE_UPDATE_QUERY;
 import static com.esm.epam.util.ParameterAttribute.BEGIN_GET_FILTERED_CERTIFICATE_LIST_QUERY;
-import static com.esm.epam.util.ParameterAttribute.BEGIN_UPDATE_QUERY;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATES_TAGS_TABLE;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_CREATE_DATE;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_DESCRIPTION;
@@ -39,24 +40,25 @@ import static com.esm.epam.util.ParameterAttribute.OR_STATEMENT;
 import static com.esm.epam.util.ParameterAttribute.SELECT_STATEMENT;
 import static com.esm.epam.util.ParameterAttribute.SORT_STATEMENT;
 import static com.esm.epam.util.ParameterAttribute.TAG;
+import static com.esm.epam.util.ParameterAttribute.WHERE_CERTIFICATE_UPDATE_QUERY;
 import static com.esm.epam.util.ParameterAttribute.WHERE_STATEMENT;
-import static com.esm.epam.util.ParameterAttribute.WHERE_UPDATE_QUERY;
 
 
 @Component
 @Qualifier(value = "certificateQueryBuilder")
-public class CertificateQueryBuilderImpl implements QueryBuilder<Certificate> {
+public class CertificateQueryBuilderImpl implements FilterQueryBuilder<Certificate>, UpdateQueryBuilder<Certificate> {
 
     @Override
-    public String getUpdateQuery(Certificate certificate, Long idCertificate) {
-        String query = BEGIN_UPDATE_QUERY;
+    public Optional<String> getUpdateQuery(Certificate certificate, Long idCertificate) {
+        Optional<String> query = Optional.empty();
         Map<String, Object> fieldsToBeUpdated = getFieldsToBeUpdated(certificate);
         String values = fieldsToBeUpdated.entrySet()
                 .stream()
                 .map(entry -> entry.getKey() + " = " + entry.getValue())
                 .collect(Collectors.joining(", "));
-
-        query = query + values + WHERE_UPDATE_QUERY + idCertificate;
+        if(!values.isEmpty()){
+            query = Optional.of(BEGIN_CERTIFICATE_UPDATE_QUERY + values + WHERE_CERTIFICATE_UPDATE_QUERY + idCertificate);
+        }
         return query;
     }
 

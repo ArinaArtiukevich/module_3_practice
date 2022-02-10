@@ -5,16 +5,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * @param <T> describes type parameter
  */
-public interface QueryBuilder<T> {
-    /**
-     * gets query to update element with idT
-     *
-     * @param t   is element with fields to be updated
-     * @param idT of element to be updated
-     * @return required query
-     */
-    String getUpdateQuery(T t, Long idT);
-
+public interface FilterQueryBuilder<T> {
     /**
      * gets query to find filtered elements
      *

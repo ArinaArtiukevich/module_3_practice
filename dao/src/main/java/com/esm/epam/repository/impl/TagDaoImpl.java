@@ -2,10 +2,10 @@ package com.esm.epam.repository.impl;
 
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
-import com.esm.epam.mapper.TagMapper;
 import com.esm.epam.repository.CRDDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -27,6 +27,8 @@ import static com.esm.epam.util.ParameterAttribute.TAG_ID;
 @Repository
 public class TagDaoImpl implements CRDDao<Tag> {
     @Autowired
+    private RowMapper<Tag> rowMapper;
+    @Autowired
     private final JdbcTemplate jdbcTemplate;
 
     public TagDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -35,7 +37,7 @@ public class TagDaoImpl implements CRDDao<Tag> {
 
     @Override
     public Optional<List<Tag>> getAll(int page, int size) {
-        return Optional.of(jdbcTemplate.query(GET_ALL_TAGS_QUERY, new TagMapper(), size, page));
+        return Optional.of(jdbcTemplate.query(GET_ALL_TAGS_QUERY, rowMapper, size, page));
     }
 
     @Override
@@ -59,7 +61,7 @@ public class TagDaoImpl implements CRDDao<Tag> {
 
     @Override
     public Optional<Tag> getById(Long id) throws DaoException {
-        List<Tag> tags = jdbcTemplate.query(GET_TAG_BY_ID_QUERY, new TagMapper(), id);
+        List<Tag> tags = jdbcTemplate.query(GET_TAG_BY_ID_QUERY, rowMapper, id);
         if (tags.isEmpty()) {
             throw new DaoException("No tag by id = " + id);
         }

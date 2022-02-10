@@ -1,14 +1,16 @@
 package com.esm.epam.repository.impl;
 
+import com.esm.epam.builder.FilterQueryBuilder;
+import com.esm.epam.builder.UpdateQueryBuilder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
-import com.esm.epam.extractor.CertificateExtractor;
-import com.esm.epam.mapper.TagMapper;
+import com.esm.epam.repository.AbstractService;
 import com.esm.epam.repository.CRUDDao;
-import com.esm.epam.builder.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -39,33 +41,41 @@ import static com.esm.epam.util.ParameterAttribute.GET_TAG_BY_NAME_QUERY;
 import static com.esm.epam.util.ParameterAttribute.TAG;
 
 @Repository
-public class CertificateDaoImpl implements CRUDDao<Certificate> {
-    @Autowired
-    private QueryBuilder<Certificate> queryBuilder;
-    @Autowired
+public class CertificateDaoImpl extends AbstractService<Certificate> implements CRUDDao<Certificate> {
+    private final FilterQueryBuilder<Certificate> filterQueryBuilder;
+    private final UpdateQueryBuilder<Certificate> updateQueryBuilder;
+    private final ResultSetExtractor<List<Certificate>> certificateExtractor;
+    private final RowMapper<Tag> rowMapper;
     private final JdbcTemplate jdbcTemplate;
 
-    public CertificateDaoImpl(JdbcTemplate jdbcTemplate) {
+    @Autowired
+    public CertificateDaoImpl(JdbcTemplate jdbcTemplate, FilterQueryBuilder<Certificate> filterQueryBuilder, UpdateQueryBuilder<Certificate> updateQueryBuilder, ResultSetExtractor<List<Certificate>> certificateExtractor, RowMapper<Tag> rowMapper) {
+        super(jdbcTemplate);
+        this.filterQueryBuilder = filterQueryBuilder;
+        this.updateQueryBuilder = updateQueryBuilder;
+        this.certificateExtractor = certificateExtractor;
+        this.rowMapper = rowMapper;
         this.jdbcTemplate = jdbcTemplate;
     }
 
+
     @Override
     public Optional<List<Certificate>> getAll(int page, int size) {
-        return getCertificates(page, size, GET_ALL_CERTIFICATES_QUERY);
+        return getCertificates(page, size, GET_ALL_CERTIFICATES_QUERY, certificateExtractor);
     }
 
     @Override
     public Optional<List<Certificate>> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
         if (params.containsKey(TAG)) {
-            params.replace(TAG, Collections.singletonList(jdbcTemplate.queryForObject(GET_TAG_BY_NAME_QUERY, new TagMapper(), params.get(TAG).get(0)).getId()));
+            params.replace(TAG, Collections.singletonList(jdbcTemplate.queryForObject(GET_TAG_BY_NAME_QUERY, rowMapper, params.get(TAG).get(0)).getId()));
         }
-        return getCertificates(page, size, queryBuilder.getFilteredList(params));
+        return getCertificates(page, size, filterQueryBuilder.getFilteredList(params), certificateExtractor);
     }
 
     @Override
     public Optional<Certificate> update(Certificate certificate, Long idCertificate) throws DaoException {
-        String updateCertificateQuery = queryBuilder.getUpdateQuery(certificate, idCertificate);
-        jdbcTemplate.update(updateCertificateQuery);
+        Optional<String> updateCertificateQuery = updateQueryBuilder.getUpdateQuery(certificate, idCertificate);
+        updateCertificateQuery.ifPresent(jdbcTemplate::update);
 
         List<Tag> tags = certificate.getTags();
         updateCertificateTags(idCertificate, tags);
@@ -100,7 +110,7 @@ public class CertificateDaoImpl implements CRUDDao<Certificate> {
     @Override
     public Optional<Certificate> getById(Long id) throws DaoException {
         Optional<Certificate> certificate = Optional.empty();
-        Optional<List<Certificate>> certificates = Optional.ofNullable(jdbcTemplate.query(GET_CERTIFICATE_BY_ID_QUERY, new CertificateExtractor(), id));
+        Optional<List<Certificate>> certificates = Optional.ofNullable(jdbcTemplate.query(GET_CERTIFICATE_BY_ID_QUERY, certificateExtractor, id));
         if (!certificates.isPresent()) {
             throw new DaoException("Certificate was not found");
         }
@@ -131,19 +141,6 @@ public class CertificateDaoImpl implements CRUDDao<Certificate> {
         return certificate;
     }
 
-    private Optional<List<Certificate>> getCertificates(int page, int size, String query) {
-        Optional<List<Certificate>> filteredCertificates = Optional.empty();
-        Optional<List<Certificate>> allCertificates = Optional.ofNullable(jdbcTemplate.query(query, new CertificateExtractor()));
-        if (allCertificates.isPresent() && allCertificates.get().size() > page) {
-            if (allCertificates.get().size() >= page + size) {
-                filteredCertificates = Optional.of(allCertificates.get().subList(page, page + size));
-            } else {
-                filteredCertificates = Optional.of(allCertificates.get().subList(page, allCertificates.get().size()));
-            }
-        }
-        return filteredCertificates;
-    }
-
     private void updateCertificateTags(long certificateId, List<Tag> tags) throws DaoException {
         if (tags != null) {
             if (tags.size() != 0) {
@@ -154,7 +151,6 @@ public class CertificateDaoImpl implements CRUDDao<Certificate> {
     }
 
     private void addCertificateTags(long certificate_id, List<Long> idsAddedTag) {
-
         for (Long idTag : idsAddedTag) {
             jdbcTemplate.update(ADD_CERTIFICATE_TAG_QUERY, certificate_id, idTag);
         }
@@ -163,14 +159,14 @@ public class CertificateDaoImpl implements CRUDDao<Certificate> {
     private List<Long> getTagsId(List<Tag> tags, long certificateId) throws DaoException {
         List<Long> idsTag = new ArrayList<>();
 
-        List<Tag> tagsDB = jdbcTemplate.query(GET_ALL_TAGS_QUERY, new TagMapper());
+        List<Tag> tagsDB = jdbcTemplate.query(GET_ALL_TAGS_QUERY, rowMapper);
         List<String> tagsNameDB = tagsDB.stream()
                 .map(Tag::getName)
                 .collect(Collectors.toList());
 
         List<Tag> validTags = tags.stream()
                 .filter(Objects::nonNull)
-                .filter(car -> car.getName() != null)
+                .filter(tag -> tag.getName() != null)
                 .collect(Collectors.toList());
 
         List<Long> certificateTagsId = jdbcTemplate.queryForList(GET_CERTIFICATE_TAGS, Long.class, certificateId);
@@ -183,7 +179,7 @@ public class CertificateDaoImpl implements CRUDDao<Certificate> {
             if (!tagsNameDB.contains(tag.getName())) {
                 jdbcTemplate.update(ADD_TAG_QUERY, tag.getName());
             }
-            Optional<Tag> requiredTag = Optional.ofNullable(jdbcTemplate.queryForObject(GET_TAG_BY_NAME_QUERY, new TagMapper(), tag.getName()));
+            Optional<Tag> requiredTag = Optional.ofNullable(jdbcTemplate.queryForObject(GET_TAG_BY_NAME_QUERY, rowMapper, tag.getName()));
             if (!requiredTag.isPresent()) {
                 throw new DaoException("No required tags to update certificates");
             }

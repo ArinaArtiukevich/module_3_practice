@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,4 +18,7 @@ public class User {
     @JsonView(View.UI.class)
     @NotBlank(message = "Login should not be empty.")
     private String login;
+
+    @JsonView(View.UI.class)
+    private List<Certificate> certificates;
 }

@@ -2,8 +2,10 @@ package com.esm.epam.extractor;
 
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,6 +22,8 @@ import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_PRICE;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_TAGS_TAG_ID;
 import static com.esm.epam.util.ParameterAttribute.TAG_NAME;
 
+@ComponentScan("com.esm.epam.extractor")
+@Component("certificateExtractor")
 public class CertificateExtractor implements ResultSetExtractor<List<Certificate>> {
     @Override
     public List<Certificate> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -28,6 +32,7 @@ public class CertificateExtractor implements ResultSetExtractor<List<Certificate
         Tag tag;
         if (rs.isBeforeFirst()) {
             rs.next();
+
             while (!rs.isAfterLast()) {
                 Certificate certificate = new Certificate();
                 idCertificate = rs.getLong(CERTIFICATE_ID);
@@ -46,7 +51,6 @@ public class CertificateExtractor implements ResultSetExtractor<List<Certificate
                 }
                 certificate.setTags(tags);
                 certificates.add(certificate);
-
             }
         }
         return certificates;
