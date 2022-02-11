@@ -12,7 +12,7 @@ public class AbstractDao<T> {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    protected Optional<List<T>> getCertificates(int page, int size, String query, ResultSetExtractor<List<T>> extractor) {
+    protected Optional<List<T>> getPaginationList(int page, int size, String query, ResultSetExtractor<List<T>> extractor) {
         Optional<List<T>> elementsList = Optional.empty();
         Optional<List<T>> allCertificates = Optional.ofNullable(jdbcTemplate.query(query, extractor));
         if (allCertificates.isPresent() && allCertificates.get().size() > page) {

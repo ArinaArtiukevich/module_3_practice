@@ -1,5 +1,6 @@
 package com.esm.epam.service;
 
+import com.esm.epam.entity.Order;
 import com.esm.epam.entity.User;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
@@ -15,5 +16,6 @@ public interface UserService {
 
     Optional<User> update(User user, Long idUser) throws DaoException, ResourceNotFoundException, ServiceException;
 
+    List<Order> getOrders(Long id, int page, int size);
 
 }

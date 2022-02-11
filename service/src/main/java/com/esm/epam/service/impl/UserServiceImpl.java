@@ -1,13 +1,17 @@
 package com.esm.epam.service.impl;
 
 import com.esm.epam.entity.Certificate;
+import com.esm.epam.entity.Order;
 import com.esm.epam.entity.User;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
 import com.esm.epam.exception.ServiceException;
 import com.esm.epam.repository.CertificateDao;
+import com.esm.epam.repository.OrderDao;
 import com.esm.epam.repository.UserDao;
 import com.esm.epam.service.UserService;
+import com.esm.epam.util.CurrentDate;
+import com.esm.epam.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,13 +23,22 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
+    private UserValidator userValidator;
+    @Autowired
     private UserDao userDao;
     @Autowired
+    private OrderDao orderDao;
+    @Autowired
     private CertificateDao certificateDao;
+    @Autowired
+    private CurrentDate date;
 
     @Override
     public List<User> getAll(int page, int size) throws ResourceNotFoundException {
         Optional<List<User>> users = userDao.getAll(page, size);
+        if (!users.isPresent()) {
+            throw new ResourceNotFoundException("Users were not found.");
+        } // todo validator or return empty list
         return users.get();
     }
 
@@ -39,35 +52,49 @@ public class UserServiceImpl implements UserService {
         return user.get();
     }
 
-   @Transactional(rollbackFor=Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Optional<User> update(User user, Long idUser) throws DaoException, ResourceNotFoundException, ServiceException {
         Optional<User> userBeforeUpdate = userDao.getById(idUser);
         Optional<User> updatedUser;
         Optional<Certificate> certificate;
-        if (!userBeforeUpdate.isPresent()) { // todo validator
-            throw new ResourceNotFoundException("No such user");
+        userValidator.validateUser(userBeforeUpdate);
+        userValidator.validateUserCertificateListToBeAdded(user.getCertificates());
+        certificate = getCertificate(user);
+        if (!certificate.isPresent()) {
+            throw new ResourceNotFoundException("No such certificate");
         }
-        if (user.getCertificates() != null) {
-            if (user.getCertificates().size() > 1) {
-                throw new ServiceException("User can add only one certificate");
-            }
-            certificate = getCertificate(user);
-            if (!certificate.isPresent()) {
-                throw new ResourceNotFoundException("No such certificate");
-            }
-            if (userBeforeUpdate.get().getBudget() >= certificate.get().getPrice()) {
-                // todo if exception
-                user.setCertificates(Arrays.asList(certificate.get()));
-                userDao.updateBudget(idUser, userBeforeUpdate.get().getBudget() - certificate.get().getPrice());
-                updatedUser = userDao.update(user, idUser);
-            } else {
-                throw new ServiceException("User does not have enough money");
-            }
+        if (userBeforeUpdate.get().getBudget() >= certificate.get().getPrice()) {
+            validateUserHasCertificate(idUser, certificate);
+            Order order = getOrder(idUser, certificate);
+            orderDao.addOrder(order);
+            user.setCertificates(Arrays.asList(certificate.get()));
+            updatedUser = userDao.updateBudget(idUser, userBeforeUpdate.get().getBudget() - certificate.get().getPrice());
         } else {
-            throw new ServiceException("Enter certificate");
+            throw new ServiceException("User does not have enough money");
         }
         return updatedUser;
+    }
+
+    @Override
+    public List<Order> getOrders(Long idUser, int page, int size) {
+        return orderDao.getOrders(idUser, page, size);
+    }
+
+    private void validateUserHasCertificate(Long idUser, Optional<Certificate> certificate) throws DaoException {
+        List<Long> certificatesId = orderDao.getUserCertificateIds(idUser);
+        if (certificatesId.contains(certificate.get().getId())) {
+            throw new DaoException("User has certificate with id = " + certificate.get().getId());
+        }
+    }
+
+    private Order getOrder(Long idUser, Optional<Certificate> certificate) {
+        Order order = new Order();
+        order.setIdUser(idUser);
+        order.setIdCertificate(certificate.get().getId());
+        order.setPaymentDate(date.getCurrentDate());
+        order.setPrice(certificate.get().getPrice());
+        return order;
     }
 
     private Optional<Certificate> getCertificate(User user) throws DaoException {

@@ -62,7 +62,7 @@ public class CertificateDaoImpl extends AbstractDao<Certificate> implements Cert
 
     @Override
     public Optional<List<Certificate>> getAll(int page, int size) {
-        return getCertificates(page, size, GET_ALL_CERTIFICATES_QUERY, certificateExtractor);
+        return getPaginationList(page, size, GET_ALL_CERTIFICATES_QUERY, certificateExtractor);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class CertificateDaoImpl extends AbstractDao<Certificate> implements Cert
         if (params.containsKey(TAG)) {
             params.replace(TAG, Collections.singletonList(jdbcTemplate.queryForObject(GET_TAG_BY_NAME_QUERY, rowMapper, params.get(TAG).get(0)).getId()));
         }
-        return getCertificates(page, size, filterQueryBuilder.getFilteredList(params), certificateExtractor);
+        return getPaginationList(page, size, filterQueryBuilder.getFilteredList(params), certificateExtractor);
     }
 
     @Override

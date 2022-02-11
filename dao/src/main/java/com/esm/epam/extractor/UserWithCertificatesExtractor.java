@@ -54,9 +54,13 @@ public class UserWithCertificatesExtractor implements ResultSetExtractor<List<Us
                     certificate.setCreateDate(rs.getString(CERTIFICATE_CREATE_DATE));
                     certificate.setLastUpdateDate(rs.getString(CERTIFICATE_LAST_UPDATE_DATE));
                     List<Tag> tags = new ArrayList<>();
-                    while (!rs.isAfterLast() && rs.getLong(CERTIFICATE_ID) == idCertificate) {
-                        tag = new Tag(rs.getLong(CERTIFICATE_TAGS_TAG_ID), rs.getString(TAG_NAME));
-                        tags.add(tag);
+                    if (certificate.getId() != 0) {
+                        while (!rs.isAfterLast() && rs.getLong(CERTIFICATE_ID) == idCertificate && rs.getLong(USER_ID) == idUser) {
+                            tag = new Tag(rs.getLong(CERTIFICATE_TAGS_TAG_ID), rs.getString(TAG_NAME));
+                            tags.add(tag);
+                            rs.next();
+                        }
+                    } else {
                         rs.next();
                     }
                     certificate.setTags(tags);

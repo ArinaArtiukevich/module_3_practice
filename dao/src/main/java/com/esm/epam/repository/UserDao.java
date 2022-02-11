@@ -11,7 +11,5 @@ public interface UserDao {
 
     Optional<User> getById(Long id) throws DaoException;
 
-    Optional<User> update(User user, Long idUser) throws DaoException;
-
-    void updateBudget(Long idUser, int budget) throws DaoException;
+    Optional<User> updateBudget(Long idUser, int budget) throws DaoException;
 }
