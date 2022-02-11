@@ -5,7 +5,7 @@ import com.esm.epam.entity.View;
 import com.esm.epam.exception.ControllerException;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
-import com.esm.epam.service.CRUDService;
+import com.esm.epam.service.CertificateService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,7 +38,7 @@ import static com.esm.epam.validator.ControllerValidator.validateSortValues;
 public class CertificateController {
 
     @Autowired
-    public CRUDService<Certificate> certificateService;
+    public CertificateService certificateService;
 
     @GetMapping(params = { "page", "size" })
     @JsonView(View.UI.class)

@@ -6,9 +6,9 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import java.util.List;
 import java.util.Optional;
 
-public class AbstractService<T> {
+public class AbstractDao<T> {
     private final JdbcTemplate jdbcTemplate;
-    public AbstractService(JdbcTemplate jdbcTemplate) {
+    public AbstractDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

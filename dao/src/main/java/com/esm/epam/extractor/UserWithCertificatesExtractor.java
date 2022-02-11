@@ -21,6 +21,7 @@ import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_NAME;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_PRICE;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_TAGS_TAG_ID;
 import static com.esm.epam.util.ParameterAttribute.TAG_NAME;
+import static com.esm.epam.util.ParameterAttribute.USER_BUDGET;
 import static com.esm.epam.util.ParameterAttribute.USER_ID;
 import static com.esm.epam.util.ParameterAttribute.USER_LOGIN;
 
@@ -40,6 +41,7 @@ public class UserWithCertificatesExtractor implements ResultSetExtractor<List<Us
                 idUser = rs.getLong(USER_ID);
                 user.setId(idUser);
                 user.setLogin(rs.getString(USER_LOGIN));
+                user.setBudget(rs.getInt(USER_BUDGET));
                 List<Certificate> certificates = new ArrayList<>();
                 while (!rs.isAfterLast() && rs.getLong(USER_ID) == idUser) {
                     Certificate certificate = new Certificate();

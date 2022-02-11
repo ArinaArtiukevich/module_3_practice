@@ -5,8 +5,8 @@ import com.esm.epam.builder.UpdateQueryBuilder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
-import com.esm.epam.repository.AbstractService;
-import com.esm.epam.repository.CRUDDao;
+import com.esm.epam.repository.AbstractDao;
+import com.esm.epam.repository.CertificateDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -36,12 +36,13 @@ import static com.esm.epam.util.ParameterAttribute.DELETE_TAG_BY_TAG_ID_AND_CERT
 import static com.esm.epam.util.ParameterAttribute.GET_ALL_CERTIFICATES_QUERY;
 import static com.esm.epam.util.ParameterAttribute.GET_ALL_TAGS_QUERY;
 import static com.esm.epam.util.ParameterAttribute.GET_CERTIFICATE_BY_ID_QUERY;
+import static com.esm.epam.util.ParameterAttribute.GET_CERTIFICATE_BY_NAME_QUERY;
 import static com.esm.epam.util.ParameterAttribute.GET_CERTIFICATE_TAGS;
 import static com.esm.epam.util.ParameterAttribute.GET_TAG_BY_NAME_QUERY;
 import static com.esm.epam.util.ParameterAttribute.TAG;
 
 @Repository
-public class CertificateDaoImpl extends AbstractService<Certificate> implements CRUDDao<Certificate> {
+public class CertificateDaoImpl extends AbstractDao<Certificate> implements CertificateDao {
     private final FilterQueryBuilder<Certificate> filterQueryBuilder;
     private final UpdateQueryBuilder<Certificate> updateQueryBuilder;
     private final ResultSetExtractor<List<Certificate>> certificateExtractor;
@@ -109,15 +110,7 @@ public class CertificateDaoImpl extends AbstractService<Certificate> implements 
 
     @Override
     public Optional<Certificate> getById(Long id) throws DaoException {
-        Optional<Certificate> certificate = Optional.empty();
-        Optional<List<Certificate>> certificates = Optional.ofNullable(jdbcTemplate.query(GET_CERTIFICATE_BY_ID_QUERY, certificateExtractor, id));
-        if (!certificates.isPresent()) {
-            throw new DaoException("Certificate was not found");
-        }
-        if (!certificates.get().isEmpty()) {
-            certificate = Optional.of(certificates.get().get(0));
-        }
-        return certificate;
+        return getCertificate(GET_CERTIFICATE_BY_ID_QUERY, id);
     }
 
     @Override
@@ -140,6 +133,24 @@ public class CertificateDaoImpl extends AbstractService<Certificate> implements 
         }
         return certificate;
     }
+
+    @Override
+    public Optional<Certificate> getByName(String name) throws DaoException {
+        return getCertificate(GET_CERTIFICATE_BY_NAME_QUERY, name);
+    }
+
+    private Optional<Certificate> getCertificate(String query, Object parameter) throws DaoException {
+        Optional<Certificate> certificate = Optional.empty();
+        Optional<List<Certificate>> certificates = Optional.ofNullable(jdbcTemplate.query(query, certificateExtractor, parameter));
+        if (!certificates.isPresent()) {
+            throw new DaoException("Certificate was not found");
+        }
+        if (!certificates.get().isEmpty()) {
+            certificate = Optional.of(certificates.get().get(0));
+        }
+        return certificate;
+    }
+
 
     private void updateCertificateTags(long certificateId, List<Tag> tags) throws DaoException {
         if (tags != null) {

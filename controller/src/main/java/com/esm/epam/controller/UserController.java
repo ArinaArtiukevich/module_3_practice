@@ -4,6 +4,7 @@ import com.esm.epam.entity.User;
 import com.esm.epam.entity.View;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
+import com.esm.epam.exception.ServiceException;
 import com.esm.epam.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") @Min(1L) Long id, @RequestBody User user) throws DaoException {
+    public ResponseEntity<User> updateUser(@PathVariable("id") @Min(1L) Long id, @RequestBody User user) throws DaoException, ResourceNotFoundException, ServiceException {
         // todo validation
         return userService.update(user, id)
                 .map(ResponseEntity::ok)

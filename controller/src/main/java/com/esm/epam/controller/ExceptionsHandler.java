@@ -4,6 +4,7 @@ import com.esm.epam.entity.ErrorResponse;
 import com.esm.epam.exception.ControllerException;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
+import com.esm.epam.exception.ServiceException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -46,6 +47,12 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DaoException.class)
     public final ResponseEntity<ErrorResponse> handleDaoException(DaoException exception) {
         ErrorResponse errorResponse = new ErrorResponse(5, exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ServiceException.class)
+    public final ResponseEntity<ErrorResponse> handleServiceException(ServiceException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(6, exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);
     }
 }

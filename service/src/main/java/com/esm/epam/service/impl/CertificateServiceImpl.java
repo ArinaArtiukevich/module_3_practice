@@ -3,8 +3,8 @@ package com.esm.epam.service.impl;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
-import com.esm.epam.repository.CRUDDao;
-import com.esm.epam.service.CRUDService;
+import com.esm.epam.repository.CertificateDao;
+import com.esm.epam.service.CertificateService;
 import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.ServiceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CertificateServiceImpl implements CRUDService<Certificate> {
+public class CertificateServiceImpl implements CertificateService {
     @Autowired
-    private CRUDDao<Certificate> certificateDao;
+    private CertificateDao certificateDao;
     @Autowired
     private ServiceValidator<Certificate> validator; // todo
     @Autowired

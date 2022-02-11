@@ -9,6 +9,7 @@ public class ParameterAttribute {
     public final static String USER_TABLE = "users";
     public final static String USER_ID = "user_id";
     public final static String USER_LOGIN = "user_login";
+    public final static String USER_BUDGET = "user_budget";
     public final static String USER_PART_NAME_FIELDS = "user_";
 
     public final static String TAG_TABLE = "tags";
@@ -83,6 +84,7 @@ public class ParameterAttribute {
             "LEFT JOIN certificates_tags ON (gift_certificates.id=certificates_tags.certificate_id) \n" +
             "LEFT JOIN tags ON (tags.tag_id = certificates_tags.tag_id) \n" +
             "WHERE  users.user_id=?";
+    public final static String UPDATE_USER_BUDGET_QUERY = "UPDATE users SET user_budget = ? WHERE user_id = ?";
 
     public final static String BEGIN_GET_FILTERED_CERTIFICATE_LIST_QUERY = "SELECT * FROM gift_certificates \n" +
             "LEFT JOIN certificates_tags ON (gift_certificates.id=certificates_tags.certificate_id) \n" +

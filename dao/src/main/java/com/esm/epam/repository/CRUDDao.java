@@ -13,14 +13,4 @@ public interface CRUDDao<T> extends CRDDao<T> {
      * @return updated element
      */
     Optional<T> update(T t, Long idT) throws DaoException;
-
-    /**
-     * deletes tag by tag's id
-     *
-     * @param id  is id of element with tags
-     * @param idTag is id of tag to be deleted
-     * @return element with updated tags
-     */
-    Optional<T> deleteTag(Long id, Long idTag) throws DaoException;
-
 }
