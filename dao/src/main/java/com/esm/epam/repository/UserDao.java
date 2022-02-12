@@ -1,5 +1,6 @@
 package com.esm.epam.repository;
 
+import com.esm.epam.entity.Tag;
 import com.esm.epam.entity.User;
 import com.esm.epam.exception.DaoException;
 
@@ -12,4 +13,6 @@ public interface UserDao {
     Optional<User> getById(Long id) throws DaoException;
 
     Optional<User> updateBudget(Long idUser, int budget) throws DaoException;
+
+    Optional<Tag> getMostWidelyUsedTag();
 }

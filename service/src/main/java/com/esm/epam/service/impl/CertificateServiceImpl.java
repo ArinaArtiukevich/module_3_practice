@@ -9,6 +9,7 @@ import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.ServiceValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
 import java.util.List;
@@ -44,6 +45,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
+    @Transactional
     public Optional<Certificate> add(Certificate certificate) throws DaoException {
         certificate.setCreateDate(date.getCurrentDate());
         return certificateDao.add(certificate);

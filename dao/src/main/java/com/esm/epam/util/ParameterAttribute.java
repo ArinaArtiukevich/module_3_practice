@@ -71,7 +71,8 @@ public class ParameterAttribute {
     public final static String DELETE_TAG_BY_TAG_ID_AND_CERTIFICATE_ID_QUERY = "DELETE FROM certificates_tags\n" +
             "    WHERE (certificates_tags.certificate_id = ?) AND (certificates_tags.tag_id = ?);\n";
 
-    public final static String GET_ALL_TAGS_QUERY = "SELECT * FROM tags ORDER BY tag_id LIMIT ? OFFSET ?";
+    public final static String GET_TAGS_PAGINATION_QUERY = "SELECT * FROM tags ORDER BY tag_id LIMIT ? OFFSET ?";
+    public final static String GET_ALL_TAGS_QUERY = "SELECT * FROM tags ORDER BY tag_id";
     public final static String GET_TAG_BY_ID_QUERY = "SELECT * FROM tags WHERE tags.tag_id = ?";
     public final static String ADD_TAG_QUERY = "INSERT INTO tags(tag_name) VALUES (?)";
     public final static String DELETE_TAG_BY_ID_QUERY = " DELETE FROM tags WHERE tags.tag_id = ?";
@@ -115,5 +116,45 @@ public class ParameterAttribute {
     public final static String IN_STATEMENT = " IN ";
     public final static String ASC_STATEMENT = "ASC";
     public final static String DESC_STATEMENT = "DESC";
+
+    public final static String GET_MOST_WIDELY_USED_TAG = "SELECT * FROM tags WHERE tags.tag_id IN (\n" +
+            "SELECT tags.tag_id\n" +
+            "FROM tags\n" +
+            "RIGHT JOIN certificates_tags ON (tags.tag_id = certificates_tags.tag_id) \n" +
+            "RIGHT JOIN gift_certificates ON (gift_certificates.id = certificates_tags.certificate_id)\n" +
+            "RIGHT JOIN orders ON (gift_certificates.id = orders.certificate_id) \n" +
+            "RIGHT JOIN users ON (orders.user_id = users.user_id) \n" +
+            "WHERE users.user_id = \n" +
+                "(SELECT orders.user_id \n" +
+                "FROM orders \n" +
+                "GROUP BY orders.user_id\n" +
+                "HAVING sum(orders.price) =\n" +
+                    "(SELECT max(user_price) FROM (\n" +
+                        "SELECT orders.user_id, sum(orders.price) as user_price \n" +
+                        "FROM orders \n" +
+                        "GROUP BY orders.user_id) AS all_users_price) \n" +
+                " LIMIT 1 OFFSET 0)\n" +
+            "GROUP BY tags.tag_id\n" +
+            "HAVING count(tags.tag_id) = \n" +
+                "( SELECT max(tags_count) FROM (\n" +
+                    "SELECT tags.tag_id, count(tags.tag_id) AS tags_count\n" +
+                    "FROM tags\n" +
+                    "RIGHT JOIN certificates_tags ON (tags.tag_id = certificates_tags.tag_id) \n" +
+                    "RIGHT JOIN gift_certificates ON (gift_certificates.id = certificates_tags.certificate_id)\n" +
+                    "RIGHT JOIN orders ON (gift_certificates.id = orders.certificate_id) \n" +
+                    "RIGHT JOIN users ON (orders.user_id = users.user_id) \n" +
+                    "WHERE users.user_id = \n" +
+                        "(SELECT orders.user_id \n" +
+                        "FROM orders \n" +
+                        "GROUP BY orders.user_id\n" +
+                        "HAVING sum(orders.price) =\n" +
+                            "(SELECT max(user_price) FROM (\n" +
+                                "SELECT orders.user_id, sum(orders.price) as user_price \n" +
+                                "FROM orders \n" +
+                                "GROUP BY orders.user_id) AS all_users_price)\n" +
+                        " LIMIT 1 OFFSET 0)\n" +
+                "GROUP BY tags.tag_id ) AS counted_tags )\n" +
+            "LIMIT 1 OFFSET 0\n" +
+            ")";
 
 }

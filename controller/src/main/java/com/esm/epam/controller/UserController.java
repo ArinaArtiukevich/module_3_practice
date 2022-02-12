@@ -1,8 +1,10 @@
 package com.esm.epam.controller;
 
 import com.esm.epam.entity.Order;
+import com.esm.epam.entity.Tag;
 import com.esm.epam.entity.User;
 import com.esm.epam.entity.View;
+import com.esm.epam.exception.ControllerException;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
 import com.esm.epam.exception.ServiceException;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.Min;
 import java.util.List;
 
+import static com.esm.epam.validator.ControllerValidator.validateUserToBeUpdated;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
@@ -54,9 +57,18 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") @Min(1L) Long id, @RequestBody User user) throws DaoException, ResourceNotFoundException, ServiceException {
-        // todo validation
+    @JsonView(View.UI.class)
+    public ResponseEntity<User> updateUser(@PathVariable("id") @Min(1L) Long id, @RequestBody User user) throws DaoException, ResourceNotFoundException, ServiceException, ControllerException {
+        validateUserToBeUpdated(user);
         return userService.update(user, id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/mostWidelyUsedTag")
+    @JsonView(View.UI.class)
+    public ResponseEntity<Tag> getMostWidelyUsedTag() {
+        return userService.getMostWidelyUsedTag()
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }

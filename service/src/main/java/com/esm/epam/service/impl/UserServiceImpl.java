@@ -2,6 +2,7 @@ package com.esm.epam.service.impl;
 
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Order;
+import com.esm.epam.entity.Tag;
 import com.esm.epam.entity.User;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
@@ -59,7 +60,6 @@ public class UserServiceImpl implements UserService {
         Optional<User> updatedUser;
         Optional<Certificate> certificate;
         userValidator.validateUser(userBeforeUpdate);
-        userValidator.validateUserCertificateListToBeAdded(user.getCertificates());
         certificate = getCertificate(user);
         if (!certificate.isPresent()) {
             throw new ResourceNotFoundException("No such certificate");
@@ -79,6 +79,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Order> getOrders(Long idUser, int page, int size) {
         return orderDao.getOrders(idUser, page, size);
+    }
+
+    @Override
+    public Optional<Tag> getMostWidelyUsedTag() {
+        return userDao.getMostWidelyUsedTag();
     }
 
     private void validateUserHasCertificate(Long idUser, Optional<Certificate> certificate) throws DaoException {

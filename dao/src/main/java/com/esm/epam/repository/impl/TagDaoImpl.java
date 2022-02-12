@@ -19,7 +19,7 @@ import java.util.Optional;
 import static com.esm.epam.util.ParameterAttribute.ADD_TAG_QUERY;
 import static com.esm.epam.util.ParameterAttribute.DELETE_TAG_BY_ID_CERTIFICATES_TAG_QUERY;
 import static com.esm.epam.util.ParameterAttribute.DELETE_TAG_BY_ID_QUERY;
-import static com.esm.epam.util.ParameterAttribute.GET_ALL_TAGS_QUERY;
+import static com.esm.epam.util.ParameterAttribute.GET_TAGS_PAGINATION_QUERY;
 import static com.esm.epam.util.ParameterAttribute.GET_TAG_BY_ID_QUERY;
 import static com.esm.epam.util.ParameterAttribute.TAG_ID;
 
@@ -37,7 +37,7 @@ public class TagDaoImpl implements CRDDao<Tag> {
 
     @Override
     public Optional<List<Tag>> getAll(int page, int size) {
-        return Optional.of(jdbcTemplate.query(GET_ALL_TAGS_QUERY, rowMapper, size, page));
+        return Optional.of(jdbcTemplate.query(GET_TAGS_PAGINATION_QUERY, rowMapper, size, page));
     }
 
     @Override
