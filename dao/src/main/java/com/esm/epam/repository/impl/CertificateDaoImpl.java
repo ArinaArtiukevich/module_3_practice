@@ -19,7 +19,6 @@ import org.springframework.util.MultiValueMap;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,7 +38,6 @@ import static com.esm.epam.util.ParameterAttribute.GET_CERTIFICATE_BY_ID_QUERY;
 import static com.esm.epam.util.ParameterAttribute.GET_CERTIFICATE_BY_NAME_QUERY;
 import static com.esm.epam.util.ParameterAttribute.GET_CERTIFICATE_TAGS;
 import static com.esm.epam.util.ParameterAttribute.GET_TAG_BY_NAME_QUERY;
-import static com.esm.epam.util.ParameterAttribute.TAG;
 
 @Repository
 public class CertificateDaoImpl extends AbstractDao<Certificate> implements CertificateDao {
@@ -67,9 +65,6 @@ public class CertificateDaoImpl extends AbstractDao<Certificate> implements Cert
 
     @Override
     public Optional<List<Certificate>> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
-        if (params.containsKey(TAG)) {
-            params.replace(TAG, Collections.singletonList(jdbcTemplate.queryForObject(GET_TAG_BY_NAME_QUERY, rowMapper, params.get(TAG).get(0)).getId()));
-        }
         return getPaginationList(page, size, filterQueryBuilder.getFilteredList(params), certificateExtractor);
     }
 

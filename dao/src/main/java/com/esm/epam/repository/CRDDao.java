@@ -44,6 +44,9 @@ public interface CRDDao<T> {
      */
     Optional<T> getById(Long id) throws DaoException;
 
+
+    Optional<T> getByName(String name) throws DaoException;
+
     /**
      * deletes element by id
      *

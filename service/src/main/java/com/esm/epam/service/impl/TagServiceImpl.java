@@ -6,7 +6,6 @@ import com.esm.epam.exception.ResourceNotFoundException;
 import com.esm.epam.repository.CRDDao;
 import com.esm.epam.service.CRDService;
 import com.esm.epam.validator.ServiceValidator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +14,13 @@ import java.util.Optional;
 @Service
 public class TagServiceImpl implements CRDService<Tag> {
 
-    @Autowired
-    private CRDDao<Tag> tagDao;
-    @Autowired
-    private ServiceValidator<Tag> validator;
+    private final CRDDao<Tag> tagDao;
+    private final ServiceValidator<Tag> validator;
+
+    public TagServiceImpl(CRDDao<Tag> tagDao, ServiceValidator<Tag> validator) {
+        this.tagDao = tagDao;
+        this.validator = validator;
+    }
 
     @Override
     public List<Tag> getAll(int page, int size) throws ResourceNotFoundException {

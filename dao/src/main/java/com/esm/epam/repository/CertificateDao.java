@@ -14,7 +14,4 @@ public interface CertificateDao extends CRUDDao<Certificate>{
      * @return element with updated tags
      */
     Optional<Certificate> deleteTag(Long id, Long idTag) throws DaoException;
-
-    Optional<Certificate> getByName(String login) throws DaoException;
-
 }

@@ -2,6 +2,7 @@ package com.esm.epam.service;
 
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
+import com.esm.epam.exception.ServiceException;
 import org.springframework.util.MultiValueMap;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public interface CRDService<T> {
      *               key and {@link Object} as value
      * @return List with sorted values
      */
-    default List<T> getFilteredList(MultiValueMap<String, Object> params, int page, int size) throws ResourceNotFoundException {
+    default List<T> getFilteredList(MultiValueMap<String, Object> params, int page, int size) throws ResourceNotFoundException, ServiceException, DaoException {
         return getAll(page, size);
     }
 

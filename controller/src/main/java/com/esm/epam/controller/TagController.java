@@ -4,7 +4,6 @@ import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
 import com.esm.epam.service.CRDService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -29,8 +28,11 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 public class TagController {
 
-    @Autowired
-    public CRDService<Tag> tagService;
+    public final CRDService<Tag> tagService;
+
+    public TagController(CRDService<Tag> tagService) {
+        this.tagService = tagService;
+    }
 
     @GetMapping(params = { "page", "size" })
     public ResponseEntity<List<Tag>> getTagList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) throws ResourceNotFoundException {

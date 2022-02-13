@@ -13,7 +13,6 @@ import com.esm.epam.repository.UserDao;
 import com.esm.epam.service.UserService;
 import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.UserValidator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,16 +22,19 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserValidator userValidator;
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private OrderDao orderDao;
-    @Autowired
-    private CertificateDao certificateDao;
-    @Autowired
-    private CurrentDate date;
+    private final UserValidator userValidator;
+    private final UserDao userDao;
+    private final OrderDao orderDao;
+    private final CertificateDao certificateDao;
+    private final CurrentDate date;
+
+    public UserServiceImpl(UserValidator userValidator, UserDao userDao, OrderDao orderDao, CertificateDao certificateDao, CurrentDate date) {
+        this.userValidator = userValidator;
+        this.userDao = userDao;
+        this.orderDao = orderDao;
+        this.certificateDao = certificateDao;
+        this.date = date;
+    }
 
     @Override
     public List<User> getAll(int page, int size) throws ResourceNotFoundException {

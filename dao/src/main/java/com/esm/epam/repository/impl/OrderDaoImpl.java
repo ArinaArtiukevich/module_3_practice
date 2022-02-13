@@ -2,7 +2,6 @@ package com.esm.epam.repository.impl;
 
 import com.esm.epam.entity.Order;
 import com.esm.epam.repository.OrderDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -19,13 +18,12 @@ import static com.esm.epam.util.ParameterAttribute.GET_USER_CERTIFICATES;
 
 @Repository
 public class OrderDaoImpl implements OrderDao {
-    @Autowired
-    private RowMapper<Order> orderRowMapper;
-    @Autowired
+    private final RowMapper<Order> orderRowMapper;
     private final JdbcTemplate jdbcTemplate;
 
-    public OrderDaoImpl(JdbcTemplate jdbcTemplate) {
+    public OrderDaoImpl(JdbcTemplate jdbcTemplate, RowMapper<Order> orderRowMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.orderRowMapper = orderRowMapper;
     }
 
     @Override

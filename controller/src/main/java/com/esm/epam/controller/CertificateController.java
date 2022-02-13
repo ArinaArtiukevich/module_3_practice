@@ -5,9 +5,9 @@ import com.esm.epam.entity.View;
 import com.esm.epam.exception.ControllerException;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
+import com.esm.epam.exception.ServiceException;
 import com.esm.epam.service.CertificateService;
 import com.fasterxml.jackson.annotation.JsonView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
@@ -37,12 +37,15 @@ import static com.esm.epam.validator.ControllerValidator.validateSortValues;
 @Validated
 public class CertificateController {
 
-    @Autowired
-    public CertificateService certificateService;
+    public final CertificateService certificateService;
+
+    public CertificateController(CertificateService certificateService) {
+        this.certificateService = certificateService;
+    }
 
     @GetMapping(params = { "page", "size" })
     @JsonView(View.UI.class)
-    public ResponseEntity<List<Certificate>> getCertificateList(@RequestParam(required = false) MultiValueMap<String, Object> params, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) throws ResourceNotFoundException, ControllerException {
+    public ResponseEntity<List<Certificate>> getCertificateList(@RequestParam(required = false) MultiValueMap<String, Object> params, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) throws ResourceNotFoundException, ControllerException, ServiceException, DaoException {
         List<Certificate> certificates = new ArrayList<>();
         if (params.size() == 2) {
             certificates = certificateService.getAll(page, size);

@@ -10,7 +10,6 @@ import com.esm.epam.exception.ResourceNotFoundException;
 import com.esm.epam.exception.ServiceException;
 import com.esm.epam.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -33,8 +32,11 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 public class UserController {
 
-    @Autowired
-    public UserService userService;
+    public final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping(params = {"page", "size"})
     @JsonView(View.UI.class)

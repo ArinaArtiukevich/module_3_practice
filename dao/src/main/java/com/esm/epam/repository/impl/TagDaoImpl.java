@@ -3,7 +3,6 @@ package com.esm.epam.repository.impl;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.repository.CRDDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -21,18 +20,18 @@ import static com.esm.epam.util.ParameterAttribute.DELETE_TAG_BY_ID_CERTIFICATES
 import static com.esm.epam.util.ParameterAttribute.DELETE_TAG_BY_ID_QUERY;
 import static com.esm.epam.util.ParameterAttribute.GET_TAGS_PAGINATION_QUERY;
 import static com.esm.epam.util.ParameterAttribute.GET_TAG_BY_ID_QUERY;
+import static com.esm.epam.util.ParameterAttribute.GET_TAG_BY_NAME_QUERY;
 import static com.esm.epam.util.ParameterAttribute.TAG_ID;
 
 
 @Repository
 public class TagDaoImpl implements CRDDao<Tag> {
-    @Autowired
-    private RowMapper<Tag> rowMapper;
-    @Autowired
+    private final RowMapper<Tag> rowMapper;
     private final JdbcTemplate jdbcTemplate;
 
-    public TagDaoImpl(JdbcTemplate jdbcTemplate) {
+    public TagDaoImpl(JdbcTemplate jdbcTemplate, RowMapper<Tag> rowMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.rowMapper = rowMapper;
     }
 
     @Override
@@ -69,6 +68,11 @@ public class TagDaoImpl implements CRDDao<Tag> {
     }
 
     @Override
+    public Optional<Tag> getByName(String name) {
+        return getTag(GET_TAG_BY_NAME_QUERY, name); // todo +certificate to abstract
+    }
+
+    @Override
     public boolean deleteById(Long id) {
         boolean isDeleted = false;
         jdbcTemplate.update(DELETE_TAG_BY_ID_CERTIFICATES_TAG_QUERY, id);
@@ -77,7 +81,15 @@ public class TagDaoImpl implements CRDDao<Tag> {
             isDeleted = true;
         }
         return isDeleted;
+    }
 
+    private Optional<Tag> getTag(String query, Object parameter) {
+        Optional<Tag> tag = Optional.empty();
+        List<Tag> tags = jdbcTemplate.query(query, rowMapper, parameter);
+        if (tags.size() == 1) {
+            tag = Optional.of(tags.get(0));
+        }
+        return tag;
     }
 
 }

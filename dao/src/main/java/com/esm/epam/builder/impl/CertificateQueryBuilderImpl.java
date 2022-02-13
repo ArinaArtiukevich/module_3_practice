@@ -56,7 +56,7 @@ public class CertificateQueryBuilderImpl implements FilterQueryBuilder<Certifica
                 .stream()
                 .map(entry -> entry.getKey() + " = " + entry.getValue())
                 .collect(Collectors.joining(", "));
-        if(!values.isEmpty()){
+        if (!values.isEmpty()) {
             query = Optional.of(BEGIN_CERTIFICATE_UPDATE_QUERY + values + WHERE_CERTIFICATE_UPDATE_QUERY + idCertificate);
         }
         return query;
@@ -144,10 +144,12 @@ public class CertificateQueryBuilderImpl implements FilterQueryBuilder<Certifica
     }
 
     private String getStatementByTagFilter(Map.Entry<String, List<Object>> entry, String whereStatement) {
+        for (Object idTag : entry.getValue()) {
+            whereStatement = prepareWhereStatement(whereStatement);
+            whereStatement = whereStatement + " ( " + CERTIFICATE_TABLE + "." + CERTIFICATE_ID + IN_STATEMENT + "(" + SELECT_STATEMENT +
+                    CERTIFICATES_TAGS_TABLE + "." + CERTIFICATE_TAGS_CERTIFICATE_ID + FROM_STATEMENT + CERTIFICATES_TAGS_TABLE + WHERE_STATEMENT + CERTIFICATES_TAGS_TABLE + "." + CERTIFICATE_TAGS_TAG_ID + " = " + idTag + " )) ";
+        }
 
-        whereStatement = prepareWhereStatement(whereStatement);
-        whereStatement = whereStatement + " ( " + CERTIFICATE_TABLE + "." + CERTIFICATE_ID + IN_STATEMENT + "(" + SELECT_STATEMENT +
-                CERTIFICATES_TAGS_TABLE + "." + CERTIFICATE_TAGS_CERTIFICATE_ID + FROM_STATEMENT + CERTIFICATES_TAGS_TABLE + WHERE_STATEMENT + CERTIFICATES_TAGS_TABLE + "." + CERTIFICATE_TAGS_TAG_ID + " = " + entry.getValue().get(0) + " )) ";
         return whereStatement;
     }
 
