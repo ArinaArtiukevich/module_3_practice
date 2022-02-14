@@ -59,6 +59,8 @@ public class ParameterAttribute {
 
     public final static String GET_CERTIFICATE_TAGS = "SELECT certificates_tags.tag_id FROM certificates_tags WHERE certificates_tags.certificate_id = ?\n";
 
+    public final static String DELETE_ORDER_QUERY = "DELETE FROM orders\n" +
+            "    WHERE orders.certificate_id = ?";
     public final static String DELETE_CERTIFICATE_BY_ID_CERTIFICATES_TAGS_QUERY = "DELETE FROM certificates_tags\n" +
             "    WHERE certificates_tags.certificate_id = ?;\n";
     public final static String DELETE_CERTIFICATE_BY_ID_QUERY =

@@ -3,9 +3,9 @@ subprojects {
     dependencies {
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.6.3'
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '2.6.3'
-        testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.6.3'
-//        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.6.3'
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '2.6.3'
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.6.3'
+        testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.6.3'
         runtimeOnly('org.postgresql:postgresql')
     }
 

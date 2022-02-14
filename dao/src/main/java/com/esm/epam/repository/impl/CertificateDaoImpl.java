@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
 import java.sql.PreparedStatement;
@@ -31,6 +32,7 @@ import static com.esm.epam.util.ParameterAttribute.ADD_TAG_QUERY;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_ID;
 import static com.esm.epam.util.ParameterAttribute.DELETE_CERTIFICATE_BY_ID_CERTIFICATES_TAGS_QUERY;
 import static com.esm.epam.util.ParameterAttribute.DELETE_CERTIFICATE_BY_ID_QUERY;
+import static com.esm.epam.util.ParameterAttribute.DELETE_ORDER_QUERY;
 import static com.esm.epam.util.ParameterAttribute.DELETE_TAG_BY_TAG_ID_AND_CERTIFICATE_ID_QUERY;
 import static com.esm.epam.util.ParameterAttribute.GET_ALL_CERTIFICATES_QUERY;
 import static com.esm.epam.util.ParameterAttribute.GET_ALL_TAGS_QUERY;
@@ -108,9 +110,11 @@ public class CertificateDaoImpl extends AbstractDao<Certificate> implements Cert
         return getCertificate(GET_CERTIFICATE_BY_ID_QUERY, id);
     }
 
+    @Transactional
     @Override
     public boolean deleteById(Long id) {
         boolean isDeleted = false;
+        jdbcTemplate.update(DELETE_ORDER_QUERY, id);
         jdbcTemplate.update(DELETE_CERTIFICATE_BY_ID_CERTIFICATES_TAGS_QUERY, id);
         int affectedRows = jdbcTemplate.update(DELETE_CERTIFICATE_BY_ID_QUERY, id);
         if (affectedRows > 0) {

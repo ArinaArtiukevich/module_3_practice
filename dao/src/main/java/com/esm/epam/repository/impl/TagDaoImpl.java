@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -69,9 +70,10 @@ public class TagDaoImpl implements CRDDao<Tag> {
 
     @Override
     public Optional<Tag> getByName(String name) {
-        return getTag(GET_TAG_BY_NAME_QUERY, name); // todo +certificate to abstract
+        return getTag(GET_TAG_BY_NAME_QUERY, name);
     }
 
+    @Transactional
     @Override
     public boolean deleteById(Long id) {
         boolean isDeleted = false;
