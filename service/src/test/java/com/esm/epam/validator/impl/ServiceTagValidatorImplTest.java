@@ -2,7 +2,6 @@ package com.esm.epam.validator.impl;
 
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.ResourceNotFoundException;
-import com.esm.epam.validator.impl.ServiceTagValidatorImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +20,7 @@ class ServiceTagValidatorImplTest {
 
     @Autowired
     private ServiceTagValidatorImpl tagValidator;
-    private Tag tag = new Tag(1L, "tag_winter");
+    private final Tag tag = new Tag(1L, "tag_winter");
 
     @Test
     void validateEntity_resourceNotFoundException() {
@@ -36,22 +35,15 @@ class ServiceTagValidatorImplTest {
     }
 
     @Test
-    void validateListIsNull_resourceNotFoundException() {
+    void validateListIsPresent_resourceNotFoundException() {
         Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            tagValidator.validateListIsNull(Optional.empty());
+            tagValidator.validateListIsPresent(Optional.empty());
         });
     }
 
     @Test
-    void validateListIsEmpty_resourceNotFoundException() {
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            tagValidator.validateListIsNull(Optional.empty());
-        });
-    }
-
-    @Test
-    void validateListIsNull_positive() throws ResourceNotFoundException {
-        tagValidator.validateListIsNull(Optional.of(Arrays.asList(tag)));
+    void validateListIsPresent_positive() throws ResourceNotFoundException {
+        tagValidator.validateListIsPresent(Optional.of(Arrays.asList(tag)));
     }
 
     @Test

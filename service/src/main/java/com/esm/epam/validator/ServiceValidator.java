@@ -29,6 +29,6 @@ public interface ServiceValidator<T> {
      *
      * @param t is list to be validated
      */
-    void validateListIsNull(Optional<List<T>> t) throws ResourceNotFoundException;
+    void validateListIsPresent(Optional<List<T>> t) throws ResourceNotFoundException;
 
 }

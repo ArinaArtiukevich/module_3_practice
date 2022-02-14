@@ -39,19 +39,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAll(int page, int size) throws ResourceNotFoundException {
         Optional<List<User>> users = userDao.getAll(page, size);
-        if (!users.isPresent()) {
-            throw new ResourceNotFoundException("Users were not found.");
-        } // todo validator or return empty list
+        userValidator.validateListIsPresent(users);
+         // todo ? return empty list
         return users.get();
     }
 
     @Override
     public User getById(Long id) throws ResourceNotFoundException, DaoException {
         Optional<User> user = userDao.getById(id);
-        // todo validator
-        if (!user.isPresent()) {
-            throw new ResourceNotFoundException("Requested user resource not found id = " + id);
-        }
+        userValidator.validateUser(user);
         return user.get();
     }
 

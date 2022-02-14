@@ -50,7 +50,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public List<Certificate> getAll(int page, int size) throws ResourceNotFoundException {
         Optional<List<Certificate>> certificates = certificateDao.getAll(page, size);
-        validator.validateListIsNull(certificates);
+        validator.validateListIsPresent(certificates);
         return certificates.get();
     }
 
@@ -77,7 +77,7 @@ public class CertificateServiceImpl implements CertificateService {
     public List<Certificate> getFilteredList(MultiValueMap<String, Object> params, int page, int size) throws ResourceNotFoundException, ServiceException, DaoException {
         prepareTagParam(params);
         Optional<List<Certificate>> certificates = certificateDao.getFilteredList(params, page, size);
-        validator.validateListIsNull(certificates);
+        validator.validateListIsPresent(certificates);
         return certificates.get();
     }
 

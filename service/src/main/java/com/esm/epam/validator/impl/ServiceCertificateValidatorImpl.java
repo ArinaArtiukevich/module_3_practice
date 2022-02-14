@@ -25,7 +25,7 @@ public class ServiceCertificateValidatorImpl implements ServiceValidator<Certifi
     }
 
     @Override
-    public void validateListIsNull(Optional<List<Certificate>> certificates) throws ResourceNotFoundException {
+    public void validateListIsPresent(Optional<List<Certificate>> certificates) throws ResourceNotFoundException {
         if (!certificates.isPresent()){
             throw new ResourceNotFoundException("Certificates not found.");
         }

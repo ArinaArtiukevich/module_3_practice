@@ -26,7 +26,7 @@ public class ServiceTagValidatorImpl implements ServiceValidator<Tag> {
     }
 
     @Override
-    public void validateListIsNull(Optional<List<Tag>> tags) throws ResourceNotFoundException {
+    public void validateListIsPresent(Optional<List<Tag>> tags) throws ResourceNotFoundException {
         if (!tags.isPresent()){
             throw new ResourceNotFoundException("Tags not found.");
         }
