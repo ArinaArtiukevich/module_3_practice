@@ -12,7 +12,7 @@ public interface UserDao {
 
     Optional<User> getById(Long id) throws DaoException;
 
-    Optional<User> updateBudget(Long idUser, int budget) throws DaoException;
+    User updateBudget(User user);
 
-    Optional<Tag> getMostWidelyUsedTag();
+    Optional<Tag> getMostWidelyUsedTag() throws DaoException;
 }

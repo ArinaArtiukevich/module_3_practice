@@ -14,11 +14,10 @@ import com.esm.epam.service.UserService;
 import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.UserValidator;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -51,12 +50,11 @@ public class UserServiceImpl implements UserService {
         return user.get();
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
-    public Optional<User> update(User user, Long idUser) throws DaoException, ResourceNotFoundException, ServiceException {
-        Optional<User> userBeforeUpdate = userDao.getById(idUser);
-        Optional<User> updatedUser;
+    public User update(User user, Long idUser) throws DaoException, ResourceNotFoundException, ServiceException {
+        User updatedUser;
         Optional<Certificate> certificate;
+        Optional<User> userBeforeUpdate = userDao.getById(idUser);
         userValidator.validateUser(userBeforeUpdate);
         certificate = getCertificate(user);
         if (!certificate.isPresent()) {
@@ -66,26 +64,36 @@ public class UserServiceImpl implements UserService {
             validateUserHasCertificate(idUser, certificate);
             Order order = getOrder(idUser, certificate);
             orderDao.addOrder(order);
-            user.setCertificates(Arrays.asList(certificate.get()));
-            updatedUser = userDao.updateBudget(idUser, userBeforeUpdate.get().getBudget() - certificate.get().getPrice());
+            prepareUserToBeUpdated(user, certificate, userBeforeUpdate);
+            updatedUser = userDao.updateBudget(user);
         } else {
             throw new ServiceException("User does not have enough money");
         }
         return updatedUser;
     }
 
-    @Override
-    public List<Order> getOrders(Long idUser, int page, int size) {
-        return orderDao.getOrders(idUser, page, size);
+    private void prepareUserToBeUpdated(User user, Optional<Certificate> certificate, Optional<User> userBeforeUpdate) {
+        List<Certificate> userCertificates = userBeforeUpdate.get().getCertificates();
+        user.setCertificates(userCertificates);
+        user.setBudget(userBeforeUpdate.get().getBudget() - certificate.get().getPrice());
+        user.setId(userBeforeUpdate.get().getId());
+        user.setLogin(userBeforeUpdate.get().getLogin());
     }
 
     @Override
-    public Optional<Tag> getMostWidelyUsedTag() {
+    public List<Order> getOrders(Long idUser, int page, int size) {
+        return orderDao.getLimitedOrders(idUser, page, size);
+    }
+
+    @Override
+    public Optional<Tag> getMostWidelyUsedTag() throws DaoException {
         return userDao.getMostWidelyUsedTag();
     }
 
     private void validateUserHasCertificate(Long idUser, Optional<Certificate> certificate) throws DaoException {
-        List<Long> certificatesId = orderDao.getUserCertificateIds(idUser);
+        List<Long> certificatesId = orderDao.getUserOrders(idUser).stream()
+                .map(Order::getIdCertificate)
+                .collect(Collectors.toList());
         if (certificatesId.contains(certificate.get().getId())) {
             throw new DaoException("User has certificate with id = " + certificate.get().getId());
         }

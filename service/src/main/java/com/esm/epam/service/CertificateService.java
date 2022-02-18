@@ -2,6 +2,7 @@ package com.esm.epam.service;
 
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.exception.DaoException;
+import com.esm.epam.exception.ResourceNotFoundException;
 
 import java.util.Optional;
 
@@ -13,5 +14,5 @@ public interface CertificateService extends CRUDService<Certificate>{
      * @param idTag is id of tag to be deleted
      * @return element with updated tags
      */
-    Optional<Certificate> deleteTag(Long id, Long idTag) throws DaoException;
+    Optional<Certificate> deleteTag(Long id, Long idTag) throws DaoException, ResourceNotFoundException;
 }

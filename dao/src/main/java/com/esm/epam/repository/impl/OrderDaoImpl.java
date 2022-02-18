@@ -4,48 +4,58 @@ import com.esm.epam.entity.Order;
 import com.esm.epam.repository.OrderDao;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
-import static com.esm.epam.util.ParameterAttribute.ADD_ORDER_QUERY;
-import static com.esm.epam.util.ParameterAttribute.GET_ALL_ORDERS_QUERY;
-import static com.esm.epam.util.ParameterAttribute.GET_USER_CERTIFICATES;
+import static com.esm.epam.util.ParameterAttribute.ORDER_FIELD_USER_ID;
 
 @Repository
 public class OrderDaoImpl implements OrderDao {
     private final RowMapper<Order> orderRowMapper;
     private final JdbcTemplate jdbcTemplate;
+    private final EntityManagerFactory entityManagerFactory;
 
-    public OrderDaoImpl(JdbcTemplate jdbcTemplate, RowMapper<Order> orderRowMapper) {
+    public OrderDaoImpl(JdbcTemplate jdbcTemplate, RowMapper<Order> orderRowMapper, EntityManagerFactory entityManagerFactory) {
         this.jdbcTemplate = jdbcTemplate;
         this.orderRowMapper = orderRowMapper;
+        this.entityManagerFactory = entityManagerFactory;
     }
 
     @Override
     public void addOrder(Order order) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(ADD_ORDER_QUERY, Statement.RETURN_GENERATED_KEYS);
-            ps.setLong(1, order.getIdUser());
-            ps.setLong(2, order.getIdCertificate());
-            ps.setInt(3, order.getPrice());
-            ps.setString(4, order.getPaymentDate());
-            return ps;
-        }, keyHolder);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(order);
+        entityManager.getTransaction().commit();
     }
 
     @Override
-    public List<Long> getUserCertificateIds(Long idUser) {
-        return jdbcTemplate.queryForList(GET_USER_CERTIFICATES, Long.class, idUser);
+    public List<Order> getUserOrders(Long idUser) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Order> criteriaQuery = criteriaBuilder.createQuery(Order.class);
+        Root<Order> root = criteriaQuery.from(Order.class);
+        criteriaQuery.where(criteriaBuilder.equal(root.get(ORDER_FIELD_USER_ID), idUser));
+        return entityManager
+                .createQuery(criteriaQuery)
+                .getResultList();
     }
 
     @Override
-    public List<Order> getOrders(Long id, int page, int size) {
-        return jdbcTemplate.query(GET_ALL_ORDERS_QUERY, orderRowMapper, id, size, page);
+    public List<Order> getLimitedOrders(Long id, int page, int size) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Order> criteriaQuery = criteriaBuilder.createQuery(Order.class);
+        Root<Order> root = criteriaQuery.from(Order.class);
+        criteriaQuery.where(criteriaBuilder.equal(root.get(ORDER_FIELD_USER_ID), id));
+        return entityManager
+                .createQuery(criteriaQuery).setFirstResult(page).setMaxResults(size)
+                .getResultList();
     }
 }

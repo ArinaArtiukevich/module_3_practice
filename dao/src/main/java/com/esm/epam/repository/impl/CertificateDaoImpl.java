@@ -1,7 +1,6 @@
 package com.esm.epam.repository.impl;
 
-import com.esm.epam.builder.FilterQueryBuilder;
-import com.esm.epam.builder.UpdateQueryBuilder;
+import com.esm.epam.builder.PredicateBuilder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
@@ -11,197 +10,131 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static com.esm.epam.util.ParameterAttribute.ADD_CERTIFICATE_QUERY;
-import static com.esm.epam.util.ParameterAttribute.ADD_CERTIFICATE_TAG_QUERY;
-import static com.esm.epam.util.ParameterAttribute.ADD_TAG_QUERY;
-import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_ID;
-import static com.esm.epam.util.ParameterAttribute.DELETE_CERTIFICATE_BY_ID_CERTIFICATES_TAGS_QUERY;
-import static com.esm.epam.util.ParameterAttribute.DELETE_CERTIFICATE_BY_ID_QUERY;
-import static com.esm.epam.util.ParameterAttribute.DELETE_ORDER_QUERY;
-import static com.esm.epam.util.ParameterAttribute.DELETE_TAG_BY_TAG_ID_AND_CERTIFICATE_ID_QUERY;
-import static com.esm.epam.util.ParameterAttribute.GET_ALL_CERTIFICATES_QUERY;
-import static com.esm.epam.util.ParameterAttribute.GET_ALL_TAGS_QUERY;
-import static com.esm.epam.util.ParameterAttribute.GET_CERTIFICATE_BY_ID_QUERY;
-import static com.esm.epam.util.ParameterAttribute.GET_CERTIFICATE_BY_NAME_QUERY;
-import static com.esm.epam.util.ParameterAttribute.GET_CERTIFICATE_TAGS;
-import static com.esm.epam.util.ParameterAttribute.GET_TAG_BY_NAME_QUERY;
+import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_FIELD_ID;
+import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_FIELD_NAME;
 
 @Repository
 public class CertificateDaoImpl extends AbstractDao<Certificate> implements CertificateDao {
-    private final FilterQueryBuilder<Certificate> filterQueryBuilder;
-    private final UpdateQueryBuilder<Certificate> updateQueryBuilder;
+    private final PredicateBuilder<Certificate> predicateBuilder;
     private final ResultSetExtractor<List<Certificate>> certificateExtractor;
     private final RowMapper<Tag> rowMapper;
     private final JdbcTemplate jdbcTemplate;
+    private final EntityManagerFactory entityManagerFactory;
 
     @Autowired
-    public CertificateDaoImpl(JdbcTemplate jdbcTemplate, FilterQueryBuilder<Certificate> filterQueryBuilder, UpdateQueryBuilder<Certificate> updateQueryBuilder, ResultSetExtractor<List<Certificate>> certificateExtractor, RowMapper<Tag> rowMapper) {
+    public CertificateDaoImpl(PredicateBuilder<Certificate> predicateBuilder, JdbcTemplate jdbcTemplate, ResultSetExtractor<List<Certificate>> certificateExtractor, RowMapper<Tag> rowMapper, EntityManagerFactory entityManagerFactory) {
         super(jdbcTemplate);
-        this.filterQueryBuilder = filterQueryBuilder;
-        this.updateQueryBuilder = updateQueryBuilder;
+        this.predicateBuilder = predicateBuilder;
         this.certificateExtractor = certificateExtractor;
         this.rowMapper = rowMapper;
         this.jdbcTemplate = jdbcTemplate;
-    }
-
-
-    @Override
-    public Optional<List<Certificate>> getAll(int page, int size) {
-        return getPaginationList(page, size, GET_ALL_CERTIFICATES_QUERY, certificateExtractor);
+        this.entityManagerFactory = entityManagerFactory;
     }
 
     @Override
     public Optional<List<Certificate>> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
-        return getPaginationList(page, size, filterQueryBuilder.getFilteredList(params), certificateExtractor);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Certificate> criteriaQuery = criteriaBuilder.createQuery(Certificate.class);
+
+        Root<Certificate> root = criteriaQuery.from(Certificate.class);
+        List<Predicate> predicates = predicateBuilder.getPredicates(params, criteriaBuilder, criteriaQuery, root);
+
+        criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        criteriaQuery.where(predicates.toArray(new Predicate[0]));
+        return Optional.ofNullable(entityManager
+                .createQuery(criteriaQuery).setFirstResult(page).setMaxResults(size).getResultList());
     }
 
     @Override
-    public Optional<Certificate> update(Certificate certificate, Long idCertificate) throws DaoException {
-        Optional<String> updateCertificateQuery = updateQueryBuilder.getUpdateQuery(certificate, idCertificate);
-        updateCertificateQuery.ifPresent(jdbcTemplate::update);
-
-        List<Tag> tags = certificate.getTags();
-        updateCertificateTags(idCertificate, tags);
-        return getById(idCertificate);
+    public Optional<List<Certificate>> getAll(int page, int size) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Certificate> criteriaQuery = criteriaBuilder.createQuery(Certificate.class);
+        Root<Certificate> root = criteriaQuery.from(Certificate.class);
+        criteriaQuery.select(root);
+        TypedQuery<Certificate> query = entityManager.createQuery(criteriaQuery);
+        return Optional.ofNullable(query.setFirstResult(page).setMaxResults(size).getResultList());
     }
 
     @Override
-    public Optional<Certificate> add(Certificate certificate) throws DaoException {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        Optional<Certificate> addedCertificate = Optional.empty();
-        long idCertificate;
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(ADD_CERTIFICATE_QUERY, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, certificate.getName());
-            ps.setString(2, certificate.getDescription());
-            ps.setLong(3, certificate.getDuration());
-            ps.setString(4, certificate.getCreateDate());
-            ps.setInt(5, certificate.getPrice());
-            return ps;
-        }, keyHolder);
+    public Certificate update(Certificate certificate) throws DaoException {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        Certificate updatedCertificate = entityManager.merge(certificate);
+        entityManager.getTransaction().commit();
+        return updatedCertificate;
+    }
 
-        Optional<Map<String, Object>> keys = Optional.ofNullable(keyHolder.getKeys());
-        if (keys.isPresent()) {
-            idCertificate = (long) keys.get().get(CERTIFICATE_ID);
-            List<Tag> tags = certificate.getTags();
-            updateCertificateTags(idCertificate, tags);
-            addedCertificate = getById(idCertificate);
-        }
-        return addedCertificate;
+    @Override
+    public Certificate add(Certificate certificate) throws DaoException {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(certificate);
+        entityManager.getTransaction().commit();
+        return certificate;
     }
 
     @Override
     public Optional<Certificate> getById(Long id) throws DaoException {
-        return getCertificate(GET_CERTIFICATE_BY_ID_QUERY, id);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        return Optional.ofNullable(entityManager.find(Certificate.class, id));
     }
 
-    @Transactional
     @Override
     public boolean deleteById(Long id) {
         boolean isDeleted = false;
-        jdbcTemplate.update(DELETE_ORDER_QUERY, id);
-        jdbcTemplate.update(DELETE_CERTIFICATE_BY_ID_CERTIFICATES_TAGS_QUERY, id);
-        int affectedRows = jdbcTemplate.update(DELETE_CERTIFICATE_BY_ID_QUERY, id);
-        if (affectedRows > 0) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaDelete<Certificate> criteriaDelete = criteriaBuilder.createCriteriaDelete(Certificate.class);
+        Root<Certificate> root = criteriaDelete.from(Certificate.class);
+        criteriaDelete.where(criteriaBuilder.equal(root.get(CERTIFICATE_FIELD_ID), id));
+        entityManager.getTransaction().begin();
+        if (entityManager.createQuery(criteriaDelete).executeUpdate() > 0) {
             isDeleted = true;
         }
+        entityManager.getTransaction().commit();
         return isDeleted;
     }
 
     @Override
     public Optional<Certificate> deleteTag(Long id, Long idTag) throws DaoException {
-        Optional<Certificate> certificate = Optional.empty();
-        int affectedRows = jdbcTemplate.update(DELETE_TAG_BY_TAG_ID_AND_CERTIFICATE_ID_QUERY, id, idTag);
-        if (affectedRows > 0) {
-            certificate = getById(id);
-        }
-        return certificate;
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        Certificate certificate = entityManager.find(Certificate.class, id);
+        certificate.getTags().removeIf(tag -> (tag.getId().equals(idTag)));
+        entityManager.getTransaction().commit();
+        return getById(id);
     }
 
     @Override
-    public Optional<Certificate> getByName(String name) throws DaoException {
-        return getCertificate(GET_CERTIFICATE_BY_NAME_QUERY, name);
-    }
-
-    private Optional<Certificate> getCertificate(String query, Object parameter) throws DaoException {
-        Optional<Certificate> certificate = Optional.empty();
-        Optional<List<Certificate>> certificates = Optional.ofNullable(jdbcTemplate.query(query, certificateExtractor, parameter));
-        if (!certificates.isPresent()) {
-            throw new DaoException("Certificate was not found");
+    public Optional<Certificate> getByName(String name) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Optional<Certificate> requiredCertificate = Optional.empty();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Certificate> criteriaQuery = criteriaBuilder.createQuery(Certificate.class);
+        Root<Certificate> root = criteriaQuery.from(Certificate.class);
+        criteriaQuery.where(criteriaBuilder.equal(root.get(CERTIFICATE_FIELD_NAME), name));
+        TypedQuery<Certificate> query = entityManager.createQuery(criteriaQuery);
+        List<Certificate> certificateList = query.getResultList();
+        if (certificateList.size() == 1) {
+            requiredCertificate = Optional.ofNullable(certificateList.get(0));
         }
-        if (!certificates.get().isEmpty()) {
-            certificate = Optional.of(certificates.get().get(0));
-        }
-        return certificate;
-    }
-
-
-    private void updateCertificateTags(long certificateId, List<Tag> tags) throws DaoException {
-        if (tags != null) {
-            if (tags.size() != 0) {
-                List<Long> idsAddedTag = getTagsId(tags, certificateId);
-                addCertificateTags(certificateId, idsAddedTag);
-            }
-        }
-    }
-
-    private void addCertificateTags(long certificate_id, List<Long> idsAddedTag) {
-        for (Long idTag : idsAddedTag) {
-            jdbcTemplate.update(ADD_CERTIFICATE_TAG_QUERY, certificate_id, idTag);
-        }
-    }
-
-    private List<Long> getTagsId(List<Tag> tags, long certificateId) throws DaoException {
-        List<Long> idsTag = new ArrayList<>();
-
-        List<Tag> tagsDB = jdbcTemplate.query(GET_ALL_TAGS_QUERY, rowMapper);
-        List<String> tagsNameDB = tagsDB.stream()
-                .map(Tag::getName)
-                .collect(Collectors.toList());
-
-        List<Tag> validTags = tags.stream()
-                .filter(Objects::nonNull)
-                .filter(tag -> tag.getName() != null)
-                .collect(Collectors.toList());
-
-        List<Long> certificateTagsId = jdbcTemplate.queryForList(GET_CERTIFICATE_TAGS, Long.class, certificateId);
-
-        return getRequiredTags(idsTag, tagsNameDB, validTags, certificateTagsId);
-    }
-
-    private List<Long> getRequiredTags(List<Long> idsTag, List<String> tagsNameDB, List<Tag> validTags, List<Long> certificateTagsId) throws DaoException {
-        for (Tag tag : validTags) {
-            if (!tagsNameDB.contains(tag.getName())) {
-                jdbcTemplate.update(ADD_TAG_QUERY, tag.getName());
-            }
-            Optional<Tag> requiredTag = Optional.ofNullable(jdbcTemplate.queryForObject(GET_TAG_BY_NAME_QUERY, rowMapper, tag.getName()));
-            if (!requiredTag.isPresent()) {
-                throw new DaoException("No required tags to update certificates");
-            }
-
-            if (!certificateTagsId.contains(requiredTag.get().getId())) {
-                idsTag.add(requiredTag.get().getId());
-            }
-        }
-
-        return idsTag.stream()
-                .distinct()
-                .collect(Collectors.toList());
+        return requiredCertificate;
     }
 
 }

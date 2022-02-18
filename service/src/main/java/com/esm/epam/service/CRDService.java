@@ -6,7 +6,6 @@ import com.esm.epam.exception.ServiceException;
 import org.springframework.util.MultiValueMap;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @param <T> describes type parameter
@@ -38,7 +37,7 @@ public interface CRDService<T> {
      * @param t the type of element to be added
      * @return element
      */
-    Optional<T> add(T t) throws DaoException;
+    T add(T t) throws DaoException;
 
     /**
      * finds element by id

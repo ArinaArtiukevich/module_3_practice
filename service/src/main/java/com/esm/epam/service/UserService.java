@@ -15,9 +15,9 @@ public interface UserService {
 
     User getById(Long id) throws ResourceNotFoundException, DaoException;
 
-    Optional<User> update(User user, Long idUser) throws DaoException, ResourceNotFoundException, ServiceException;
+    User update(User user, Long idUser) throws DaoException, ResourceNotFoundException, ServiceException;
 
     List<Order> getOrders(Long id, int page, int size);
 
-    Optional<Tag> getMostWidelyUsedTag();
+    Optional<Tag> getMostWidelyUsedTag() throws DaoException;
 }

@@ -3,95 +3,94 @@ package com.esm.epam.repository.impl;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.repository.CRDDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import static com.esm.epam.util.ParameterAttribute.ADD_TAG_QUERY;
-import static com.esm.epam.util.ParameterAttribute.DELETE_TAG_BY_ID_CERTIFICATES_TAG_QUERY;
-import static com.esm.epam.util.ParameterAttribute.DELETE_TAG_BY_ID_QUERY;
-import static com.esm.epam.util.ParameterAttribute.GET_TAGS_PAGINATION_QUERY;
-import static com.esm.epam.util.ParameterAttribute.GET_TAG_BY_ID_QUERY;
-import static com.esm.epam.util.ParameterAttribute.GET_TAG_BY_NAME_QUERY;
-import static com.esm.epam.util.ParameterAttribute.TAG_ID;
+import static com.esm.epam.util.ParameterAttribute.TAG_FIELD_ID;
+import static com.esm.epam.util.ParameterAttribute.TAG_FIELD_NAME;
 
 
 @Repository
 public class TagDaoImpl implements CRDDao<Tag> {
     private final RowMapper<Tag> rowMapper;
     private final JdbcTemplate jdbcTemplate;
+    private final EntityManagerFactory entityManagerFactory;
 
-    public TagDaoImpl(JdbcTemplate jdbcTemplate, RowMapper<Tag> rowMapper) {
+    @Autowired
+    public TagDaoImpl(JdbcTemplate jdbcTemplate, RowMapper<Tag> rowMapper, EntityManagerFactory entityManagerFactory) {
         this.jdbcTemplate = jdbcTemplate;
         this.rowMapper = rowMapper;
+        this.entityManagerFactory = entityManagerFactory;
     }
 
     @Override
     public Optional<List<Tag>> getAll(int page, int size) {
-        return Optional.of(jdbcTemplate.query(GET_TAGS_PAGINATION_QUERY, rowMapper, size, page));
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tag> criteriaQuery = criteriaBuilder.createQuery(Tag.class);
+        Root<Tag> root = criteriaQuery.from(Tag.class);
+        criteriaQuery.select(root);
+        TypedQuery<Tag> query = entityManager.createQuery(criteriaQuery);
+        return Optional.ofNullable(query.setFirstResult(page).setMaxResults(size).getResultList());
     }
 
     @Override
-    public Optional<Tag> add(Tag tag) throws DaoException {
-        Optional<Tag> addedTag = Optional.empty();
-        Long idAddedObject;
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(ADD_TAG_QUERY, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, tag.getName());
-            return ps;
-        }, keyHolder);
-
-        Optional<Map<String, Object>> keys = Optional.ofNullable(keyHolder.getKeys());
-        if (keys.isPresent()) {
-            idAddedObject = (long) keys.get().get(TAG_ID);
-            addedTag = getById(idAddedObject);
-        }
-        return addedTag;
+    public Tag add(Tag tag) throws DaoException {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(tag);
+        entityManager.getTransaction().commit();
+        return tag;
     }
 
     @Override
     public Optional<Tag> getById(Long id) throws DaoException {
-        List<Tag> tags = jdbcTemplate.query(GET_TAG_BY_ID_QUERY, rowMapper, id);
-        if (tags.isEmpty()) {
-            throw new DaoException("No tag by id = " + id);
-        }
-        return Optional.of(tags.get(0));
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        return Optional.ofNullable(entityManager.find(Tag.class, id));
     }
 
     @Override
     public Optional<Tag> getByName(String name) {
-        return getTag(GET_TAG_BY_NAME_QUERY, name);
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        Optional<Tag> requiredTag = Optional.empty();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tag> criteriaQuery = criteriaBuilder.createQuery(Tag.class);
+        Root<Tag> root = criteriaQuery.from(Tag.class);
+        criteriaQuery.where(criteriaBuilder.equal(root.get(TAG_FIELD_NAME), name));
+        TypedQuery<Tag> query = entityManager.createQuery(criteriaQuery);
+        List<Tag> tagList = query.getResultList();
+        if(tagList.size() == 1){
+            requiredTag = Optional.ofNullable(tagList.get(0));
+        }
+         return requiredTag;
     }
 
-    @Transactional
     @Override
     public boolean deleteById(Long id) {
         boolean isDeleted = false;
-        jdbcTemplate.update(DELETE_TAG_BY_ID_CERTIFICATES_TAG_QUERY, id);
-        int affectedRows = jdbcTemplate.update(DELETE_TAG_BY_ID_QUERY, id);
-        if (affectedRows > 0) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaDelete<Tag> criteriaDelete = criteriaBuilder.createCriteriaDelete(Tag.class);
+        Root<Tag> root = criteriaDelete.from(Tag.class);
+        criteriaDelete.where(criteriaBuilder.equal(root.get(TAG_FIELD_ID), id));
+        entityManager.getTransaction().begin();
+        if (entityManager.createQuery(criteriaDelete).executeUpdate() > 0) {
             isDeleted = true;
         }
+        entityManager.getTransaction().commit();
         return isDeleted;
-    }
-
-    private Optional<Tag> getTag(String query, Object parameter) {
-        Optional<Tag> tag = Optional.empty();
-        List<Tag> tags = jdbcTemplate.query(query, rowMapper, parameter);
-        if (tags.size() == 1) {
-            tag = Optional.of(tags.get(0));
-        }
-        return tag;
     }
 
 }

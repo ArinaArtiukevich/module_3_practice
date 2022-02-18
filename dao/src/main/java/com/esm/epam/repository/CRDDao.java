@@ -34,7 +34,7 @@ public interface CRDDao<T> {
      * @param t the type of element to be added
      * @return element
      */
-    Optional<T> add(T t) throws DaoException;
+    T add(T t) throws DaoException; //todo delete optional
 
     /**
      * finds element by id

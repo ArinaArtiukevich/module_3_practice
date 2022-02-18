@@ -8,45 +8,72 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
+import static javax.persistence.CascadeType.MERGE;
+
+@Entity
+@Table(name = "gift_certificates")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+//@EqualsAndHashCode
 public class Certificate extends RepresentationModel<Certificate> {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     @JsonView(View.UI.class)
     private Long id;
 
+    @Column(name = "name")
     @JsonView(View.UI.class)
-    @NotBlank(message = "Certificate name should not be empty.")
     private String name;
 
+    @Column(name = "description")
     @JsonView(View.UI.class)
-    @NotBlank(message = "Certificate description should not be empty.")
     private String description;
 
+    @Column(name = "price")
     @JsonView(View.UI.class)
-    @NotNull(message = "Price should not be null.")
     @Min(value = 0, message = "Price should be positive.")
     private Integer price;
 
+    @Column(name = "duration")
     @JsonView(View.UI.class)
-    @NotNull(message = "Duration should not be null.")
     @Min(value = 0, message = "Duration should be positive.")
     private Integer duration;
 
+    @Column(name = "creation_date")
     @JsonView(View.REST.class)
     private String createDate;
 
+    @Column(name = "last_update_date")
     @JsonView(View.REST.class)
     private String lastUpdateDate;
 
+    @ManyToMany(cascade = {
+            MERGE
+    })
+    @JoinTable(name = "certificates_tags",
+            joinColumns = {@JoinColumn(name = "certificate_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id")})
     @JsonView(View.UI.class)
     private List<Tag> tags;
+
+    @ManyToMany(mappedBy = "certificates")
+    @JsonView(View.REST.class)
+    private List<User> userList;
 
 }

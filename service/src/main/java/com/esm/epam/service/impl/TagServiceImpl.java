@@ -30,7 +30,7 @@ public class TagServiceImpl implements CRDService<Tag> {
     }
 
     @Override
-    public Optional<Tag> add(Tag tag) throws DaoException {
+    public Tag add(Tag tag) throws DaoException {
         return tagDao.add(tag);
 
     }

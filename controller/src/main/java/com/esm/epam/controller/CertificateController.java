@@ -73,6 +73,7 @@ public class CertificateController {
 
 
     @DeleteMapping("/{id}/tags/{tag_id}")
+    @JsonView(View.UI.class)
     public ResponseEntity<RepresentationModel<Certificate>> deleteTagCertificate(@PathVariable("id") @Min(1L) Long id, @PathVariable("tag_id") @Min(1L) Long idTag) throws DaoException, ControllerException, ServiceException, ResourceNotFoundException {
         ResponseEntity<RepresentationModel<Certificate>> responseEntity;
         Optional<Certificate> addedCertificate = certificateService.deleteTag(id, idTag);
@@ -86,6 +87,7 @@ public class CertificateController {
     }
 
     @DeleteMapping("/{id}")
+    @JsonView(View.UI.class)
     public ResponseEntity<RepresentationModel<Certificate>> deleteCertificate(@PathVariable("id") @Min(1L) Long id) throws ResourceNotFoundException, ControllerException, ServiceException, DaoException {
         ResponseEntity<RepresentationModel<Certificate>> responseEntity;
         if (certificateService.deleteById(id)) {
@@ -99,30 +101,23 @@ public class CertificateController {
     }
 
     @PostMapping
+    @JsonView(View.UI.class)
     public ResponseEntity<RepresentationModel<Certificate>> addCertificate(@Valid @RequestBody Certificate certificate) throws DaoException, ControllerException, ServiceException, ResourceNotFoundException {
         ResponseEntity<RepresentationModel<Certificate>> responseEntity;
-        Optional<Certificate> addedCertificate = certificateService.add(certificate);
-        if (addedCertificate.isPresent()) {
-            hateoasBuilder.buildFullHateoas(addedCertificate.get());
-            responseEntity = new ResponseEntity<>(addedCertificate.get(), OK);
-        } else {
-            responseEntity = ResponseEntity.noContent().build();
-        }
+        Certificate addedCertificate = certificateService.add(certificate);
+        hateoasBuilder.buildFullHateoas(addedCertificate);
+        responseEntity = new ResponseEntity<>(addedCertificate, OK);
+
         return responseEntity;
     }
 
     @PatchMapping("/{id}")
+    @JsonView(View.UI.class)
     public ResponseEntity<RepresentationModel<Certificate>> updateCertificate(@PathVariable("id") @Min(1L) Long id, @RequestBody Certificate certificate) throws ControllerException, ResourceNotFoundException, DaoException, ServiceException {
         validateIntToBeUpdated(certificate.getDuration());
         validateIntToBeUpdated(certificate.getPrice());
-        ResponseEntity<RepresentationModel<Certificate>> responseEntity;
-        Optional<Certificate> updatedCertificate = certificateService.update(certificate, id);
-        if (updatedCertificate.isPresent()) {
-            hateoasBuilder.buildFullHateoas(updatedCertificate.get());
-            responseEntity = new ResponseEntity<>(updatedCertificate.get(), OK);
-        } else {
-            responseEntity = ResponseEntity.noContent().build();
-        }
-        return responseEntity;
+        Certificate updatedCertificate = certificateService.update(certificate, id);
+        hateoasBuilder.buildFullHateoas(updatedCertificate);
+        return new ResponseEntity<>(updatedCertificate, OK);
     }
 }

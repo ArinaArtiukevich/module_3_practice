@@ -1,5 +1,6 @@
 package com.esm.epam.service.impl;
 
+import com.esm.epam.builder.Builder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
@@ -26,21 +27,23 @@ public class CertificateServiceImpl implements CertificateService {
     private final CRDDao<Tag> tagDao;
     private final ServiceValidator<Certificate> validator; // todo
     private final CurrentDate date;
+    private final Builder<Certificate> certificateBuilder;
 
-    public CertificateServiceImpl(CertificateDao certificateDao, CRDDao<Tag> tagDao, ServiceValidator<Certificate> validator, CurrentDate date) {
+    public CertificateServiceImpl(CertificateDao certificateDao, CRDDao<Tag> tagDao, ServiceValidator<Certificate> validator, CurrentDate date, Builder<Certificate> certificateBuilder) {
         this.certificateDao = certificateDao;
         this.tagDao = tagDao;
         this.validator = validator;
         this.date = date;
+        this.certificateBuilder = certificateBuilder;
     }
 
     @Override
-    public Optional<Certificate> update(Certificate certificate, Long idCertificate) throws DaoException, ResourceNotFoundException {
+    public Certificate update(Certificate certificate, Long idCertificate) throws DaoException, ResourceNotFoundException {
         Optional<Certificate> certificateBeforeUpdate = certificateDao.getById(idCertificate);
-        Optional<Certificate> updatedCertificate = Optional.empty();
+        Certificate updatedCertificate;
         if (certificateBeforeUpdate.isPresent()) {
-            certificate.setLastUpdateDate(date.getCurrentDate());
-            updatedCertificate = certificateDao.update(certificate, idCertificate);
+            Certificate toBeUpdatedCertificate = certificateBuilder.buildObject(certificateBeforeUpdate.get(), certificate);
+            updatedCertificate = certificateDao.update(toBeUpdatedCertificate);
         } else {
             throw new ResourceNotFoundException("No such certificate");
         }
@@ -56,7 +59,7 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     @Transactional
-    public Optional<Certificate> add(Certificate certificate) throws DaoException {
+    public Certificate add(Certificate certificate) throws DaoException {
         certificate.setCreateDate(date.getCurrentDate());
         return certificateDao.add(certificate);
     }
@@ -82,14 +85,20 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public Optional<Certificate> deleteTag(Long id, Long idTag) throws DaoException {
+    public Optional<Certificate> deleteTag(Long id, Long idTag) throws DaoException, ResourceNotFoundException {
+        Optional<Certificate> certificate = certificateDao.getById(id);
+        validator.validateEntity(certificate, id);
+        certificate.get().getTags().stream()
+                .filter(localTag -> idTag.equals(localTag.getId()))
+                .findAny()
+                .orElseThrow(() -> new ResourceNotFoundException("Requested tag resource not found id = " + idTag));
         return certificateDao.deleteTag(id, idTag);
     }
 
     private void prepareTagParam(MultiValueMap<String, Object> params) throws ServiceException, DaoException {
         if (params.containsKey(TAG)) {
             List<Object> nameTags = params.get(TAG);
-            List<Long> idTags = new ArrayList<>();
+            List<Tag> tags = new ArrayList<>();
             for (Object name : nameTags) {
                 if (!name.getClass().equals(String.class)) {
                     throw new ServiceException("Enter tag name");
@@ -98,10 +107,10 @@ public class CertificateServiceImpl implements CertificateService {
                 if (!tag.isPresent()) {
                     throw new ServiceException("Tag with name = " + name + " does not exist");
                 }
-                idTags.add(tag.get().getId());
+                tags.add(tag.get());
             }
-            List<Object> idTagsObjectList = new ArrayList<>(idTags);
-            params.replace(TAG, idTagsObjectList);
+            List<Object> tagsObjectList = new ArrayList<>(tags);
+            params.replace(TAG, tagsObjectList);
         }
     }
 }

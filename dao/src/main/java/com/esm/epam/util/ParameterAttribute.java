@@ -1,6 +1,24 @@
 package com.esm.epam.util;
 
 public class ParameterAttribute {
+    public final static String TAG_FIELD_ID = "id";
+    public final static String TAG_FIELD_NAME = "name";
+    public final static String TAG_FIELD_CERTIFICATES = "certificateList";
+
+    public final static String CERTIFICATE_FIELD_ID = "id";
+    public final static String CERTIFICATE_FIELD_NAME = "name";
+    public final static String CERTIFICATE_FIELD_DESCRIPTION = "description";
+    public final static String CERTIFICATE_FIELD_TAGS = "tags";
+    public final static String CERTIFICATE_FIELD_DATE = "createDate";
+    public final static String CERTIFICATE_FIELD_USERS = "userList";
+
+
+    public final static String ORDER_FIELD_PRICE = "price";
+    public final static String ORDER_FIELD_USER_ID = "idUser";
+    public final static String ORDER_FIELD_ORDER_ID = "id";
+
+    public final static String PERCENT_SYMBOL = "%";
+
     public final static String DATABASE_DRIVER = "org.postgresql.Driver";
     public final static String DATABASE_URL = "jdbc:postgresql://localhost:5432/lab_module_2_projectDB";
     public final static String DATABASE_USERNAME = "postgres";

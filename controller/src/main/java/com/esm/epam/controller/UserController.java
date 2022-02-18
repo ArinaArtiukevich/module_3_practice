@@ -75,15 +75,9 @@ public class UserController {
     @JsonView(View.UI.class)
     public ResponseEntity<RepresentationModel<User>> updateUser(@PathVariable("id") @Min(1L) Long id, @RequestBody User user) throws DaoException, ResourceNotFoundException, ServiceException, ControllerException {
         validateUserToBeUpdated(user);
-        ResponseEntity<RepresentationModel<User>> responseEntity;
-        Optional<User> updatedUser = userService.update(user, id);
-        if (updatedUser.isPresent()) {
-            hateoasBuilder.buildFullHateoas(updatedUser.get());
-            responseEntity = new ResponseEntity<>(updatedUser.get(), OK);
-        } else {
-            responseEntity = ResponseEntity.noContent().build();
-        }
-        return responseEntity;
+        User updatedUser = userService.update(user, id);
+        hateoasBuilder.buildFullHateoas(updatedUser);
+        return new ResponseEntity<>(updatedUser, OK);
     }
 
     @GetMapping("/mostWidelyUsedTag")
