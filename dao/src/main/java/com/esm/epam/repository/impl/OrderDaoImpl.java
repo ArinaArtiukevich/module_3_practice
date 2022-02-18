@@ -2,8 +2,6 @@ package com.esm.epam.repository.impl;
 
 import com.esm.epam.entity.Order;
 import com.esm.epam.repository.OrderDao;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -17,13 +15,9 @@ import static com.esm.epam.util.ParameterAttribute.ORDER_FIELD_USER_ID;
 
 @Repository
 public class OrderDaoImpl implements OrderDao {
-    private final RowMapper<Order> orderRowMapper;
-    private final JdbcTemplate jdbcTemplate;
     private final EntityManagerFactory entityManagerFactory;
 
-    public OrderDaoImpl(JdbcTemplate jdbcTemplate, RowMapper<Order> orderRowMapper, EntityManagerFactory entityManagerFactory) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.orderRowMapper = orderRowMapper;
+    public OrderDaoImpl(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
 

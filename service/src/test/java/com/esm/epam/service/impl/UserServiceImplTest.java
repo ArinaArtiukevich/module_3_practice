@@ -16,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -139,14 +142,21 @@ class UserServiceImplTest {
                 .build();
 
         when(userDao.getById(2L)).thenReturn(Optional.ofNullable(users.get(1)));
-        when(userDao.updateBudget(2L, 820)).thenReturn(Optional.ofNullable(expectedUser));
+
+        doAnswer(new Answer<User>() {
+            public User answer(InvocationOnMock invocation) {
+                users.get(1).setBudget(820);
+                return users.get(1);
+            }
+        }).when(userDao).updateBudget(expectedUser);
+
         when(certificateDao.getById(4L)).thenReturn(Optional.ofNullable(certificate));
-        Optional<User> actualUser = userService.update(userToBeUpdated, 2L);
+        Optional<User> actualUser = Optional.ofNullable(userService.update(userToBeUpdated, 2L));
         assertEquals(expectedUser, actualUser.get());
     }
 
     @Test
-    void getMostWidelyUsedTag() {
+    void getMostWidelyUsedTag() throws DaoException {
         Tag expectedTag = new Tag(2L, "tag_name");
         doReturn(Optional.of(expectedTag)).when(userDao).getMostWidelyUsedTag();
         Optional<Tag> actualTag = userService.getMostWidelyUsedTag();

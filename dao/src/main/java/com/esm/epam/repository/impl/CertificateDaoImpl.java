@@ -2,14 +2,11 @@ package com.esm.epam.repository.impl;
 
 import com.esm.epam.builder.PredicateBuilder;
 import com.esm.epam.entity.Certificate;
-import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.repository.AbstractDao;
 import com.esm.epam.repository.CertificateDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.MultiValueMap;
 
@@ -30,18 +27,12 @@ import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_FIELD_NAME;
 @Repository
 public class CertificateDaoImpl extends AbstractDao<Certificate> implements CertificateDao {
     private final PredicateBuilder<Certificate> predicateBuilder;
-    private final ResultSetExtractor<List<Certificate>> certificateExtractor;
-    private final RowMapper<Tag> rowMapper;
-    private final JdbcTemplate jdbcTemplate;
     private final EntityManagerFactory entityManagerFactory;
 
     @Autowired
-    public CertificateDaoImpl(PredicateBuilder<Certificate> predicateBuilder, JdbcTemplate jdbcTemplate, ResultSetExtractor<List<Certificate>> certificateExtractor, RowMapper<Tag> rowMapper, EntityManagerFactory entityManagerFactory) {
+    public CertificateDaoImpl(PredicateBuilder<Certificate> predicateBuilder, JdbcTemplate jdbcTemplate, EntityManagerFactory entityManagerFactory) {
         super(jdbcTemplate);
         this.predicateBuilder = predicateBuilder;
-        this.certificateExtractor = certificateExtractor;
-        this.rowMapper = rowMapper;
-        this.jdbcTemplate = jdbcTemplate;
         this.entityManagerFactory = entityManagerFactory;
     }
 

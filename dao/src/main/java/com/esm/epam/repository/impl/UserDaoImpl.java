@@ -8,8 +8,6 @@ import com.esm.epam.repository.AbstractDao;
 import com.esm.epam.repository.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -29,17 +27,12 @@ import static com.esm.epam.util.ParameterAttribute.TAG_FIELD_ID;
 
 @Repository
 public class UserDaoImpl extends AbstractDao<User> implements UserDao {
-    private final ResultSetExtractor<List<User>> userExtractor;
-    private final JdbcTemplate jdbcTemplate;
-    private final RowMapper<Tag> rowMapper;
+
     private final EntityManagerFactory entityManagerFactory;
 
     @Autowired
-    public UserDaoImpl(JdbcTemplate jdbcTemplate, ResultSetExtractor<List<User>> userExtractor, RowMapper<Tag> rowMapper, EntityManagerFactory entityManagerFactory) {
+    public UserDaoImpl(JdbcTemplate jdbcTemplate, EntityManagerFactory entityManagerFactory) {
         super(jdbcTemplate);
-        this.userExtractor = userExtractor;
-        this.jdbcTemplate = jdbcTemplate;
-        this.rowMapper = rowMapper;
         this.entityManagerFactory = entityManagerFactory;
     }
 

@@ -4,8 +4,6 @@ import com.esm.epam.entity.Tag;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.repository.CRDDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -24,14 +22,10 @@ import static com.esm.epam.util.ParameterAttribute.TAG_FIELD_NAME;
 
 @Repository
 public class TagDaoImpl implements CRDDao<Tag> {
-    private final RowMapper<Tag> rowMapper;
-    private final JdbcTemplate jdbcTemplate;
     private final EntityManagerFactory entityManagerFactory;
 
     @Autowired
-    public TagDaoImpl(JdbcTemplate jdbcTemplate, RowMapper<Tag> rowMapper, EntityManagerFactory entityManagerFactory) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.rowMapper = rowMapper;
+    public TagDaoImpl(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
 
@@ -71,10 +65,10 @@ public class TagDaoImpl implements CRDDao<Tag> {
         criteriaQuery.where(criteriaBuilder.equal(root.get(TAG_FIELD_NAME), name));
         TypedQuery<Tag> query = entityManager.createQuery(criteriaQuery);
         List<Tag> tagList = query.getResultList();
-        if(tagList.size() == 1){
+        if (tagList.size() == 1) {
             requiredTag = Optional.ofNullable(tagList.get(0));
         }
-         return requiredTag;
+        return requiredTag;
     }
 
     @Override

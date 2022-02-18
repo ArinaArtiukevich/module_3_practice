@@ -25,7 +25,7 @@ import static com.esm.epam.util.ParameterAttribute.TAG;
 public class CertificateServiceImpl implements CertificateService {
     private final CertificateDao certificateDao;
     private final CRDDao<Tag> tagDao;
-    private final ServiceValidator<Certificate> validator; // todo
+    private final ServiceValidator<Certificate> validator;
     private final CurrentDate date;
     private final Builder<Certificate> certificateBuilder;
 
