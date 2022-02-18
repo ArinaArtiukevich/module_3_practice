@@ -11,13 +11,13 @@ import java.util.List;
  * @param <T> describes type parameter
  */
 public interface CRDService<T> {
-    //todo javadoc
     /**
      * gets all values
      *
+     * @param page is started element
+     * @param size the number of items to be returned
      * @return List with values
      */
-
     List<T> getAll(int page, int size) throws ResourceNotFoundException;
 
     /**
@@ -25,6 +25,8 @@ public interface CRDService<T> {
      *
      * @param params collection that contains {@link String} as
      *               key and {@link Object} as value
+     * @param page   is started element
+     * @param size   the number of items to be returned
      * @return List with sorted values
      */
     default List<T> getFilteredList(MultiValueMap<String, Object> params, int page, int size) throws ResourceNotFoundException, ServiceException, DaoException {

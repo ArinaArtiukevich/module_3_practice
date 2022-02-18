@@ -4,7 +4,6 @@ import com.esm.epam.entity.Order;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.entity.User;
 import com.esm.epam.exception.DaoException;
-import com.esm.epam.repository.AbstractDao;
 import com.esm.epam.repository.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,13 +25,14 @@ import static com.esm.epam.util.ParameterAttribute.TAG_FIELD_CERTIFICATES;
 import static com.esm.epam.util.ParameterAttribute.TAG_FIELD_ID;
 
 @Repository
-public class UserDaoImpl extends AbstractDao<User> implements UserDao {
+
+
+public class UserDaoImpl implements UserDao {
 
     private final EntityManagerFactory entityManagerFactory;
 
     @Autowired
     public UserDaoImpl(JdbcTemplate jdbcTemplate, EntityManagerFactory entityManagerFactory) {
-        super(jdbcTemplate);
         this.entityManagerFactory = entityManagerFactory;
     }
 

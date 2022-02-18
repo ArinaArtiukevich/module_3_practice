@@ -3,7 +3,6 @@ package com.esm.epam.repository.impl;
 import com.esm.epam.builder.PredicateBuilder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.exception.DaoException;
-import com.esm.epam.repository.AbstractDao;
 import com.esm.epam.repository.CertificateDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,13 +24,12 @@ import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_FIELD_ID;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_FIELD_NAME;
 
 @Repository
-public class CertificateDaoImpl extends AbstractDao<Certificate> implements CertificateDao {
+public class CertificateDaoImpl implements CertificateDao {
     private final PredicateBuilder<Certificate> predicateBuilder;
     private final EntityManagerFactory entityManagerFactory;
 
     @Autowired
     public CertificateDaoImpl(PredicateBuilder<Certificate> predicateBuilder, JdbcTemplate jdbcTemplate, EntityManagerFactory entityManagerFactory) {
-        super(jdbcTemplate);
         this.predicateBuilder = predicateBuilder;
         this.entityManagerFactory = entityManagerFactory;
     }
