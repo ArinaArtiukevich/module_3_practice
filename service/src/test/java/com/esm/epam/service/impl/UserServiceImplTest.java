@@ -3,6 +3,7 @@ package com.esm.epam.service.impl;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.entity.User;
+import com.esm.epam.entity.audit.ModificationInformation;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
 import com.esm.epam.exception.ServiceException;
@@ -21,6 +22,7 @@ import org.mockito.stubbing.Answer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -78,7 +80,6 @@ class UserServiceImplTest {
             .price(200)
             .duration(100)
             .build();
-    private final User userToBeUpdated = User.builder().certificates(Arrays.asList(certificate)).build();
 
     @Mock
     private UserDaoImpl userDao = Mockito.mock(UserDaoImpl.class);
@@ -100,7 +101,7 @@ class UserServiceImplTest {
 
     @Test
     void getAll_positive() throws ResourceNotFoundException {
-        when(userDao.getAll(0, 1000)).thenReturn(Optional.of(users));
+        when(userDao.getAll(0, 1000)).thenReturn(users);
         List<User> actualUsers = userService.getAll(0, 1000);
         assertEquals(users, actualUsers);
     }
@@ -116,7 +117,10 @@ class UserServiceImplTest {
 
     @Test
     void update() throws DaoException, ServiceException, ResourceNotFoundException {
-        User expectedUser = User.builder().id(2L).login("viktor").budget(820).certificates(Arrays.asList(
+        ModificationInformation modificationInformation = new ModificationInformation();
+        modificationInformation.setCreatedEntityBy("arina");
+        modificationInformation.setCreationEntityDate(LocalDateTime.of(2022, 2,20,9,10));
+        User expectedUser = User.builder().id(2L).login("viktor").budget(820).modificationInformation(modificationInformation).certificates(Arrays.asList(
                         Certificate.builder()
                                 .id(2L)
                                 .name("hockey")
@@ -141,18 +145,28 @@ class UserServiceImplTest {
                                 .build()))
                 .build();
 
+
+        User userToBeUpdated = User.builder().certificates(Arrays.asList(certificate)).build();
+        userToBeUpdated.setModificationInformation(modificationInformation);
+
         when(userDao.getById(2L)).thenReturn(Optional.ofNullable(users.get(1)));
+        doAnswer(new Answer<Optional<User>>() {
+            public Optional<User> answer(InvocationOnMock invocation) {
+                users.get(1).setModificationInformation(modificationInformation);
+                return Optional.of(users.get(1));
+            }
+        }).when(userDao).getById(2L);
 
         doAnswer(new Answer<User>() {
             public User answer(InvocationOnMock invocation) {
                 users.get(1).setBudget(820);
+                users.get(1).setModificationInformation(modificationInformation);
                 return users.get(1);
             }
         }).when(userDao).updateBudget(expectedUser);
-
         when(certificateDao.getById(4L)).thenReturn(Optional.ofNullable(certificate));
-        Optional<User> actualUser = Optional.ofNullable(userService.update(userToBeUpdated, 2L));
-        assertEquals(expectedUser, actualUser.get());
+        User actualUser = userService.update(userToBeUpdated, 2L);
+        assertEquals(expectedUser, actualUser);
     }
 
     @Test

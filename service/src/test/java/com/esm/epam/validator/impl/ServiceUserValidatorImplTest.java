@@ -45,25 +45,13 @@ class ServiceUserValidatorImplTest {
     @Test
     void validateUser_resourceNotFoundException() {
         Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            userValidator.validateUser(Optional.empty());
+            userValidator.validateEntity(Optional.empty(), 1L);
         });
     }
 
     @Test
     void validateUser_positive() throws ResourceNotFoundException {
-        userValidator.validateUser(Optional.ofNullable(user));
-    }
-
-    @Test
-    void validateListIsPresent_resourceNotFoundException() {
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            userValidator.validateListIsPresent(Optional.empty());
-        });
-    }
-
-    @Test
-    void validateListIsPresent_positive() throws ResourceNotFoundException {
-        userValidator.validateListIsPresent(Optional.of(Collections.singletonList(user)));
+        userValidator.validateEntity(Optional.ofNullable(user), 1L);
     }
 
 }

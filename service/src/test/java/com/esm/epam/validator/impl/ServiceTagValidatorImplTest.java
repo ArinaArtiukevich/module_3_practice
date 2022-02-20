@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 @SpringBootTest
@@ -32,23 +31,6 @@ class ServiceTagValidatorImplTest {
     @Test
     void validateEntity_positive() throws ResourceNotFoundException {
         tagValidator.validateEntity(Optional.ofNullable(tag), 1L);
-    }
-
-    @Test
-    void validateListIsPresent_resourceNotFoundException() {
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            tagValidator.validateListIsPresent(Optional.empty());
-        });
-    }
-
-    @Test
-    void validateListIsPresent_positive() throws ResourceNotFoundException {
-        tagValidator.validateListIsPresent(Optional.of(Arrays.asList(tag)));
-    }
-
-    @Test
-    void validateListIsEmpty_positive() throws ResourceNotFoundException {
-        tagValidator.validateListIsEmpty(Arrays.asList(tag));
     }
 
 }

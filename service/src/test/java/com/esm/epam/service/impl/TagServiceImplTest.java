@@ -43,7 +43,7 @@ class TagServiceImplTest {
 
     @Test
     public void testGetAll_positive() throws ResourceNotFoundException {
-        when(tagDao.getAll(0, 1000)).thenReturn(Optional.ofNullable(tags));
+        when(tagDao.getAll(0, 1000)).thenReturn(tags);
         List<Tag> actualTags = tagService.getAll(0, 1000);
         assertEquals(tags, actualTags);
     }
@@ -65,8 +65,8 @@ class TagServiceImplTest {
     @Test
     public void testDeleteById_positive() {
         when(tagDao.deleteById(2L)).thenReturn(true);
-        tagService.deleteById(tags.get(0).getId());
-        Mockito.verify(tagDao).deleteById(tags.get(0).getId());
+        tagService.deleteById(tags.get(0).getIdTag());
+        Mockito.verify(tagDao).deleteById(tags.get(0).getIdTag());
     }
 
     @Test

@@ -111,7 +111,7 @@ class CertificateServiceImplTest {
         }).when(certificateDao).update(certificateWithFieldsToBeUpdated);
         when(certificateDao.getById(1L)).thenReturn(Optional.ofNullable(certificate));
         when(certificateBuilder.buildObject(certificate, certificateWithFieldsToBeUpdated)).thenReturn(expectedCertificate);
-        when(certificateDao.getAll(0, 1000)).thenReturn(Optional.of(Arrays.asList(certificate)));
+        when(certificateDao.getAll(0, 1000)).thenReturn(Arrays.asList(certificate));
 
         certificateService.update(certificateWithFieldsToBeUpdated, 1L);
         Optional<Certificate> actualCertificate = certificateDao.getById(1L);
@@ -121,7 +121,7 @@ class CertificateServiceImplTest {
 
     @Test
     void testGetAll_positive() throws ResourceNotFoundException {
-        when(certificateDao.getAll(0, 1000)).thenReturn(Optional.ofNullable(certificates));
+        when(certificateDao.getAll(0, 1000)).thenReturn(certificates);
         List<Certificate> actualCertificates = certificateService.getAll(0, 1000);
         assertEquals(certificates, actualCertificates);
     }
@@ -175,10 +175,10 @@ class CertificateServiceImplTest {
         params.add("name", partName);
         List<Certificate> list = new LinkedList<>(certificates);
 
-        doAnswer(new Answer<Optional<List<Certificate>>>() {
-            public Optional<List<Certificate>> answer(InvocationOnMock invocation) {
+        doAnswer(new Answer<List<Certificate>>() {
+            public List<Certificate> answer(InvocationOnMock invocation) {
                 list.removeIf(e -> !e.getName().contains(partName));
-                return Optional.of(list);
+                return list;
             }
         }).when(certificateDao).getFilteredList(params, 0, 1000);
 

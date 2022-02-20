@@ -10,8 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 
 @SpringBootTest
@@ -39,32 +37,5 @@ class ServiceCertificateValidatorImplTest {
     @Test
     void testValidateEntity_positive() throws ResourceNotFoundException {
         certificateValidator.validateEntity(Optional.ofNullable(certificate), 1L);
-    }
-
-    @Test
-    void validateListIsEmpty_resourceNotFoundException() {
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            certificateValidator.validateListIsEmpty(new ArrayList<>());
-        });
-    }
-
-    @Test
-    void validateListIsPresent_resourceNotFoundException() {
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            certificateValidator.validateListIsPresent(Optional.empty());
-        });
-    }
-
-
-    @Test
-    void validateListIsEmpty_positive() throws ResourceNotFoundException {
-        certificateValidator.validateListIsEmpty(Arrays.asList(certificate));
-
-    }
-
-    @Test
-    void validateListIsPresent_positive() throws ResourceNotFoundException {
-        certificateValidator.validateListIsPresent(Optional.of(Arrays.asList(certificate)));
-
     }
 }
