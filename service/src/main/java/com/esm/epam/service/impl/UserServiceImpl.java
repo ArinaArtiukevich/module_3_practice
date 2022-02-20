@@ -12,7 +12,7 @@ import com.esm.epam.repository.OrderDao;
 import com.esm.epam.repository.UserDao;
 import com.esm.epam.service.UserService;
 import com.esm.epam.util.CurrentDate;
-import com.esm.epam.validator.UserValidator;
+import com.esm.epam.validator.ServiceValidator;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,13 +21,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserValidator userValidator;
+    private final ServiceValidator<User> userValidator;
     private final UserDao userDao;
     private final OrderDao orderDao;
     private final CertificateDao certificateDao;
     private final CurrentDate date;
 
-    public UserServiceImpl(UserValidator userValidator, UserDao userDao, OrderDao orderDao, CertificateDao certificateDao, CurrentDate date) {
+    public UserServiceImpl(ServiceValidator<User> userValidator, UserDao userDao, OrderDao orderDao, CertificateDao certificateDao, CurrentDate date) {
         this.userValidator = userValidator;
         this.userDao = userDao;
         this.orderDao = orderDao;
@@ -37,16 +37,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAll(int page, int size) throws ResourceNotFoundException {
-        Optional<List<User>> users = userDao.getAll(page, size);
-        userValidator.validateListIsPresent(users);
-         // todo ? return empty list
-        return users.get();
+        return userDao.getAll(page, size);
     }
 
     @Override
     public User getById(Long id) throws ResourceNotFoundException, DaoException {
         Optional<User> user = userDao.getById(id);
-        userValidator.validateUser(user);
+        userValidator.validateEntity(user, id);
         return user.get();
     }
 
@@ -55,7 +52,7 @@ public class UserServiceImpl implements UserService {
         User updatedUser;
         Optional<Certificate> certificate;
         Optional<User> userBeforeUpdate = userDao.getById(idUser);
-        userValidator.validateUser(userBeforeUpdate);
+        userValidator.validateEntity(userBeforeUpdate, idUser);
         certificate = getCertificate(user);
         if (!certificate.isPresent()) {
             throw new ResourceNotFoundException("No such certificate");
@@ -78,6 +75,9 @@ public class UserServiceImpl implements UserService {
         user.setBudget(userBeforeUpdate.get().getBudget() - certificate.get().getPrice());
         user.setId(userBeforeUpdate.get().getId());
         user.setLogin(userBeforeUpdate.get().getLogin());
+        user.getModificationInformation().setCreatedEntityBy(userBeforeUpdate.get().getModificationInformation().getCreatedEntityBy());
+        user.getModificationInformation().setCreationEntityDate(userBeforeUpdate.get().getModificationInformation().getCreationEntityDate());
+
     }
 
     @Override

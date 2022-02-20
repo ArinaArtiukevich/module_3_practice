@@ -30,14 +30,14 @@ public class TagDaoImpl implements CRDDao<Tag> {
     }
 
     @Override
-    public Optional<List<Tag>> getAll(int page, int size) {
+    public List<Tag> getAll(int page, int size) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tag> criteriaQuery = criteriaBuilder.createQuery(Tag.class);
         Root<Tag> root = criteriaQuery.from(Tag.class);
         criteriaQuery.select(root);
         TypedQuery<Tag> query = entityManager.createQuery(criteriaQuery);
-        return Optional.ofNullable(query.setFirstResult(page).setMaxResults(size).getResultList());
+        return query.setFirstResult(page).setMaxResults(size).getResultList();
     }
 
     @Override

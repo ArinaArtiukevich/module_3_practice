@@ -1,5 +1,6 @@
 package com.esm.epam.entity;
 
+import com.esm.epam.entity.audit.ModificationInformation;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,7 +31,6 @@ import static javax.persistence.CascadeType.MERGE;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-//@EqualsAndHashCode
 public class Certificate extends RepresentationModel<Certificate> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +38,7 @@ public class Certificate extends RepresentationModel<Certificate> {
     @JsonView(View.UI.class)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     @JsonView(View.UI.class)
     private String name;
 
@@ -76,4 +77,6 @@ public class Certificate extends RepresentationModel<Certificate> {
     @JsonView(View.REST.class)
     private List<User> userList;
 
+    @Embedded
+    private ModificationInformation modificationInformation = new ModificationInformation();
 }

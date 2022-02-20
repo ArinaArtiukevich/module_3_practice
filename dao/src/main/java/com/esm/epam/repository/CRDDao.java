@@ -17,7 +17,7 @@ public interface CRDDao<T> {
      * @param size the number of items to be returned
      * @return List with values
      */
-    Optional<List<T>> getAll(int page, int size);
+    List<T> getAll(int page, int size);
 
     /**
      * gets filtered values
@@ -28,7 +28,7 @@ public interface CRDDao<T> {
      * @param size   the number of items to be returned
      * @return List with sorted values
      */
-    default Optional<List<T>> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
+    default List<T> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
         return getAll(page, size);
     }
 

@@ -24,7 +24,7 @@ public class TagHateoasBuilderImpl implements HateoasBuilder<Tag> {
     @Override
     public void buildFullHateoas(Tag tag) throws ResourceNotFoundException, DaoException, ControllerException, ServiceException {
         buildDefaultHateoas(tag);
-        tag.add(linkTo(methodOn(TagController.class).getTag(tag.getId())).withSelfRel().withType("GET"));
-        tag.add(linkTo(methodOn(TagController.class).deleteTag(tag.getId())).withSelfRel().withType("DELETE"));
+        tag.add(linkTo(methodOn(TagController.class).getTag(tag.getIdTag())).withSelfRel().withType("GET"));
+        tag.add(linkTo(methodOn(TagController.class).deleteTag(tag.getIdTag())).withSelfRel().withType("DELETE"));
     }
 }

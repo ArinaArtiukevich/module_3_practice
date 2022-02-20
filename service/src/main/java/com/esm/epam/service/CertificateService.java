@@ -6,11 +6,11 @@ import com.esm.epam.exception.ResourceNotFoundException;
 
 import java.util.Optional;
 
-public interface CertificateService extends CRUDService<Certificate>{
+public interface CertificateService extends CRUDService<Certificate> {
     /**
      * deletes tag by tag's id
      *
-     * @param id  is id of element with tags
+     * @param id    is id of element with tags
      * @param idTag is id of tag to be deleted
      * @return element with updated tags
      */

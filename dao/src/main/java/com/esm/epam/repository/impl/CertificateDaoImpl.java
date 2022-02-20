@@ -35,7 +35,7 @@ public class CertificateDaoImpl implements CertificateDao {
     }
 
     @Override
-    public Optional<List<Certificate>> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
+    public List<Certificate> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Certificate> criteriaQuery = criteriaBuilder.createQuery(Certificate.class);
@@ -45,19 +45,19 @@ public class CertificateDaoImpl implements CertificateDao {
 
         criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         criteriaQuery.where(predicates.toArray(new Predicate[0]));
-        return Optional.ofNullable(entityManager
-                .createQuery(criteriaQuery).setFirstResult(page).setMaxResults(size).getResultList());
+        return entityManager
+                .createQuery(criteriaQuery).setFirstResult(page).setMaxResults(size).getResultList();
     }
 
     @Override
-    public Optional<List<Certificate>> getAll(int page, int size) {
+    public List<Certificate> getAll(int page, int size) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Certificate> criteriaQuery = criteriaBuilder.createQuery(Certificate.class);
         Root<Certificate> root = criteriaQuery.from(Certificate.class);
         criteriaQuery.select(root);
         TypedQuery<Certificate> query = entityManager.createQuery(criteriaQuery);
-        return Optional.ofNullable(query.setFirstResult(page).setMaxResults(size).getResultList());
+        return query.setFirstResult(page).setMaxResults(size).getResultList();
     }
 
     @Override
@@ -75,7 +75,12 @@ public class CertificateDaoImpl implements CertificateDao {
         entityManager.getTransaction().begin();
         entityManager.persist(certificate);
         entityManager.getTransaction().commit();
-        return certificate;
+
+        Optional<Certificate> addedCertificate = getById(certificate.getId());
+        if (!addedCertificate.isPresent()){
+            throw new DaoException("Certificate was not added");
+        }
+        return addedCertificate.get();
     }
 
     @Override
@@ -105,7 +110,7 @@ public class CertificateDaoImpl implements CertificateDao {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
         Certificate certificate = entityManager.find(Certificate.class, id);
-        certificate.getTags().removeIf(tag -> (tag.getId().equals(idTag)));
+        certificate.getTags().removeIf(tag -> (tag.getIdTag().equals(idTag)));
         entityManager.getTransaction().commit();
         return getById(id);
     }

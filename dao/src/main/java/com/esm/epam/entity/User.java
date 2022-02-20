@@ -1,5 +1,6 @@
 package com.esm.epam.entity;
 
+import com.esm.epam.entity.audit.ModificationInformation;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -38,7 +40,7 @@ public class User extends RepresentationModel<User> {
     @JsonView(View.UI.class)
     private Long id;
 
-    @Column(name = "user_login")
+    @Column(name = "user_login", unique = true)
     @JsonView(View.UI.class)
     @NotBlank(message = "Login should not be empty.")
     private String login;
@@ -57,4 +59,8 @@ public class User extends RepresentationModel<User> {
             inverseJoinColumns = {@JoinColumn(name = "certificate_id")})
     @JsonView(View.UI.class)
     private List<Certificate> certificates;
+
+    @Embedded
+    private ModificationInformation modificationInformation = new ModificationInformation();
+
 }

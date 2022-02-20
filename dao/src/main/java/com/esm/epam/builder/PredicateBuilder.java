@@ -16,10 +16,10 @@ public interface PredicateBuilder<T> {
     /**
      * gets predicates to build query
      *
-     * @param params collection that contains {@link String} as key and {@link Object} as value
+     * @param params          collection that contains {@link String} as key and {@link Object} as value
      * @param criteriaBuilder used to create predicate
-     * @param criteriaQuery used to specify the ordering expressions
-     * @param root is a root type in the from clause
+     * @param criteriaQuery   used to specify the ordering expressions
+     * @param root            is a root type in the from clause
      * @return required list
      */
     List<Predicate> getPredicates(MultiValueMap<String, Object> params, CriteriaBuilder criteriaBuilder, CriteriaQuery<Certificate> criteriaQuery, Root<Certificate> root);

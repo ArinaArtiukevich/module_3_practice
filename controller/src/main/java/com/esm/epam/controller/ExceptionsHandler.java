@@ -59,6 +59,7 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);
 
     }
+
     @ExceptionHandler(PSQLException.class)
     public final ResponseEntity<ErrorResponse> handlePSQLException(PSQLException exception) {
         ErrorResponse errorResponse = new ErrorResponse(7, exception.getLocalizedMessage());

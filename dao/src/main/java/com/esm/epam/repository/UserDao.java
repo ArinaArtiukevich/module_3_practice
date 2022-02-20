@@ -15,7 +15,7 @@ public interface UserDao {
      * @param size the number of items to be returned
      * @return List with users
      */
-    Optional<List<User>> getAll(int page, int size);
+    List<User> getAll(int page, int size);
 
     /**
      * finds user by id

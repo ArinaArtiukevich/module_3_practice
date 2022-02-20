@@ -24,9 +24,7 @@ public class TagServiceImpl implements CRDService<Tag> {
 
     @Override
     public List<Tag> getAll(int page, int size) throws ResourceNotFoundException {
-        Optional<List<Tag>> tags = tagDao.getAll(page, size);
-        validator.validateListIsPresent(tags);
-        return tags.get();
+        return tagDao.getAll(page, size);
     }
 
     @Override

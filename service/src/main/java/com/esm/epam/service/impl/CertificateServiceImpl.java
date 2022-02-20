@@ -12,7 +12,6 @@ import com.esm.epam.service.CertificateService;
 import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.ServiceValidator;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
@@ -52,13 +51,10 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public List<Certificate> getAll(int page, int size) throws ResourceNotFoundException {
-        Optional<List<Certificate>> certificates = certificateDao.getAll(page, size);
-        validator.validateListIsPresent(certificates);
-        return certificates.get();
+        return certificateDao.getAll(page, size);
     }
 
     @Override
-    @Transactional
     public Certificate add(Certificate certificate) throws DaoException {
         certificate.setCreateDate(date.getCurrentDate());
         return certificateDao.add(certificate);
@@ -79,9 +75,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public List<Certificate> getFilteredList(MultiValueMap<String, Object> params, int page, int size) throws ResourceNotFoundException, ServiceException, DaoException {
         prepareTagParam(params);
-        Optional<List<Certificate>> certificates = certificateDao.getFilteredList(params, page, size);
-        validator.validateListIsPresent(certificates);
-        return certificates.get();
+        return certificateDao.getFilteredList(params, page, size);
     }
 
     @Override
@@ -89,7 +83,7 @@ public class CertificateServiceImpl implements CertificateService {
         Optional<Certificate> certificate = certificateDao.getById(id);
         validator.validateEntity(certificate, id);
         certificate.get().getTags().stream()
-                .filter(localTag -> idTag.equals(localTag.getId()))
+                .filter(localTag -> idTag.equals(localTag.getIdTag()))
                 .findAny()
                 .orElseThrow(() -> new ResourceNotFoundException("Requested tag resource not found id = " + idTag));
         return certificateDao.deleteTag(id, idTag);

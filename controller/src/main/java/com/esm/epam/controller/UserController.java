@@ -12,7 +12,6 @@ import com.esm.epam.hateoas.HateoasBuilder;
 import com.esm.epam.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.hateoas.RepresentationModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +44,7 @@ public class UserController {
 
     @GetMapping(params = {"page", "size"})
     @JsonView(View.UI.class)
-    public ResponseEntity<List<User>> getUserList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) throws ResourceNotFoundException, DaoException, ServiceException, ControllerException {
+    public ResponseEntity<List<User>> getUserList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) throws ResourceNotFoundException, DaoException, ServiceException, ControllerException, ServiceException {
         List<User> users = userService.getAll(page, size);
         for (User user : users) {
             hateoasBuilder.buildFullHateoas(user);
@@ -68,7 +67,7 @@ public class UserController {
         for (Order order : orders) {
             hateoasBuilder.buildDefaultHateoas(order);
         }
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+        return new ResponseEntity<>(orders, OK);
     }
 
     @PatchMapping("/{id}")

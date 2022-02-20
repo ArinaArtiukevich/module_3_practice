@@ -31,6 +31,8 @@ public class CertificateBuilderImpl implements Builder<Certificate> {
         newCertificate.setId(currentObject.getId());
         newCertificate.setLastUpdateDate(date.getCurrentDate());
         newCertificate.setCreateDate(currentObject.getCreateDate());
+        newCertificate.getModificationInformation().setCreatedEntityBy(currentObject.getModificationInformation().getCreatedEntityBy());
+        newCertificate.getModificationInformation().setCreationEntityDate(currentObject.getModificationInformation().getCreationEntityDate());
 
         if (objectToBeUpdated.getName() != null) {
             newCertificate.setName(objectToBeUpdated.getName());
@@ -76,13 +78,13 @@ public class CertificateBuilderImpl implements Builder<Certificate> {
         List<Tag> tagsToBeAdded = objectToBeUpdated.getTags();
         Optional<Tag> tagToBeAdded;
         for (Tag tag : tagsToBeAdded) {
-            if (tag.getId() == null && tag.getName() != null) {
+            if (tag.getIdTag() == null && tag.getName() != null) {
                 tagToBeAdded = tagDao.getByName(tag.getName());
                 addTagToList(tagToBeAdded, tags, tag);
-            } else if (tag.getId() != null && tag.getName() == null) {
-                tagToBeAdded = tagDao.getById(tag.getId());
+            } else if (tag.getIdTag() != null && tag.getName() == null) {
+                tagToBeAdded = tagDao.getById(tag.getIdTag());
                 addTagToList(tagToBeAdded, tags, tag);
-            } else if (tag.getId() != null && tag.getName() != null) {
+            } else if (tag.getIdTag() != null && tag.getName() != null) {
                 tags.add(tag);
             }
         }

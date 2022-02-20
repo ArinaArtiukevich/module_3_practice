@@ -6,7 +6,6 @@ import com.esm.epam.entity.User;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.repository.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -32,19 +31,19 @@ public class UserDaoImpl implements UserDao {
     private final EntityManagerFactory entityManagerFactory;
 
     @Autowired
-    public UserDaoImpl(JdbcTemplate jdbcTemplate, EntityManagerFactory entityManagerFactory) {
+    public UserDaoImpl(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
 
     @Override
-    public Optional<List<User>> getAll(int page, int size) {
+    public List<User> getAll(int page, int size) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
         Root<User> root = criteriaQuery.from(User.class);
         criteriaQuery.select(root);
         TypedQuery<User> query = entityManager.createQuery(criteriaQuery);
-        return Optional.ofNullable(query.setFirstResult(page).setMaxResults(size).getResultList());
+        return query.setFirstResult(page).setMaxResults(size).getResultList();
 
     }
 

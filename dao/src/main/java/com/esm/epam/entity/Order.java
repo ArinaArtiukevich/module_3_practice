@@ -1,5 +1,6 @@
 package com.esm.epam.entity;
 
+import com.esm.epam.entity.audit.ModificationInformation;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -48,5 +50,8 @@ public class Order extends RepresentationModel<Order> {
     @NotBlank(message = "Payment date should not be empty.")
     @JsonView(View.UI.class)
     private String paymentDate;
+
+    @Embedded
+    private ModificationInformation modificationInformation = new ModificationInformation();
 
 }
