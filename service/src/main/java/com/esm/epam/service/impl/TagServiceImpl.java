@@ -34,14 +34,14 @@ public class TagServiceImpl implements CRDService<Tag> {
     }
 
     @Override
-    public Tag getById(Long id) throws ResourceNotFoundException, DaoException {
+    public Tag getById(long id) throws ResourceNotFoundException, DaoException {
         Optional<Tag> tag = tagDao.getById(id);
         validator.validateEntity(tag, id);
         return tag.get();
     }
 
     @Override
-    public boolean deleteById(Long id) {
+    public boolean deleteById(long id) {
         return tagDao.deleteById(id);
     }
 }

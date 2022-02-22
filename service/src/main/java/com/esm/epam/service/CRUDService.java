@@ -11,6 +11,6 @@ public interface CRUDService<T> extends CRDService<T> {
      * @param idT of element to be updated
      * @return updated element
      */
-    T update(T t, Long idT) throws ResourceNotFoundException, DaoException;
+    T update(T t, long idT) throws ResourceNotFoundException, DaoException;
 
 }

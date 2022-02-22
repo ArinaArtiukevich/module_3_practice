@@ -37,7 +37,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public Certificate update(Certificate certificate, Long idCertificate) throws DaoException, ResourceNotFoundException {
+    public Certificate update(Certificate certificate, long idCertificate) throws DaoException, ResourceNotFoundException {
         Optional<Certificate> certificateBeforeUpdate = certificateDao.getById(idCertificate);
         Certificate updatedCertificate;
         if (certificateBeforeUpdate.isPresent()) {
@@ -61,14 +61,14 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public Certificate getById(Long id) throws ResourceNotFoundException, DaoException {
+    public Certificate getById(long id) throws ResourceNotFoundException, DaoException {
         Optional<Certificate> certificate = certificateDao.getById(id);
         validator.validateEntity(certificate, id);
         return certificate.get();
     }
 
     @Override
-    public boolean deleteById(Long id) {
+    public boolean deleteById(long id) {
         return certificateDao.deleteById(id);
     }
 
@@ -79,11 +79,11 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public Optional<Certificate> deleteTag(Long id, Long idTag) throws DaoException, ResourceNotFoundException {
+    public Optional<Certificate> deleteTag(long id, long idTag) throws DaoException, ResourceNotFoundException {
         Optional<Certificate> certificate = certificateDao.getById(id);
         validator.validateEntity(certificate, id);
         certificate.get().getTags().stream()
-                .filter(localTag -> idTag.equals(localTag.getIdTag()))
+                .filter(localTag -> idTag == localTag.getIdTag())
                 .findAny()
                 .orElseThrow(() -> new ResourceNotFoundException("Requested tag resource not found id = " + idTag));
         return certificateDao.deleteTag(id, idTag);

@@ -46,7 +46,7 @@ public interface CRDDao<T> {
      * @param id is required element id
      * @return required element
      */
-    Optional<T> getById(Long id) throws DaoException;
+    Optional<T> getById(long id) throws DaoException;
 
     /**
      * finds element by name
@@ -62,6 +62,6 @@ public interface CRDDao<T> {
      * @param id is required element id
      * @return true when element was deleted
      */
-    boolean deleteById(Long id);
+    boolean deleteById(long id);
 }
 

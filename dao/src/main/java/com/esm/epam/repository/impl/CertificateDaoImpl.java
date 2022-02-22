@@ -5,7 +5,6 @@ import com.esm.epam.entity.Certificate;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.repository.CertificateDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.MultiValueMap;
 
@@ -29,7 +28,7 @@ public class CertificateDaoImpl implements CertificateDao {
     private final EntityManagerFactory entityManagerFactory;
 
     @Autowired
-    public CertificateDaoImpl(PredicateBuilder<Certificate> predicateBuilder, JdbcTemplate jdbcTemplate, EntityManagerFactory entityManagerFactory) {
+    public CertificateDaoImpl(PredicateBuilder<Certificate> predicateBuilder, EntityManagerFactory entityManagerFactory) {
         this.predicateBuilder = predicateBuilder;
         this.entityManagerFactory = entityManagerFactory;
     }
@@ -84,13 +83,13 @@ public class CertificateDaoImpl implements CertificateDao {
     }
 
     @Override
-    public Optional<Certificate> getById(Long id) throws DaoException {
+    public Optional<Certificate> getById(long id) throws DaoException {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         return Optional.ofNullable(entityManager.find(Certificate.class, id));
     }
 
     @Override
-    public boolean deleteById(Long id) {
+    public boolean deleteById(long id) {
         boolean isDeleted = false;
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -106,7 +105,7 @@ public class CertificateDaoImpl implements CertificateDao {
     }
 
     @Override
-    public Optional<Certificate> deleteTag(Long id, Long idTag) throws DaoException {
+    public Optional<Certificate> deleteTag(long id, long idTag) throws DaoException {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
         Certificate certificate = entityManager.find(Certificate.class, id);

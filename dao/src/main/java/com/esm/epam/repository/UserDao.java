@@ -23,7 +23,7 @@ public interface UserDao {
      * @param id is required element id
      * @return required element
      */
-    Optional<User> getById(Long id) throws DaoException;
+    Optional<User> getById(long id) throws DaoException;
 
     /**
      * updates user budget

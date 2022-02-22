@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
 
@@ -40,9 +39,9 @@ public class TagController {
         this.hateoasBuilder = hateoasBuilder;
     }
 
-    @GetMapping(params = {"page", "size"})
+    @GetMapping
     @JsonView(View.UI.class)
-    public ResponseEntity<List<Tag>> getTagList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) throws ResourceNotFoundException, DaoException, ControllerException, ServiceException {
+    public ResponseEntity<List<Tag>> getTagList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) throws ControllerException, ServiceException, ResourceNotFoundException, DaoException {
         List<Tag> tags = tagService.getAll(page, size);
         for (Tag tag : tags) {
             hateoasBuilder.buildFullHateoas(tag);
@@ -52,7 +51,7 @@ public class TagController {
 
     @GetMapping("/{id}")
     @JsonView(View.UI.class)
-    public ResponseEntity<Tag> getTag(@PathVariable("id") @Min(1L) Long id) throws ResourceNotFoundException, DaoException, ControllerException, ServiceException {
+    public ResponseEntity<Tag> getTag(@PathVariable("id") @Min(1L) long id) throws ControllerException, ServiceException, ResourceNotFoundException, DaoException {
         Tag tag = tagService.getById(id);
         hateoasBuilder.buildFullHateoas(tag);
         return new ResponseEntity<>(tag, OK);
@@ -60,7 +59,7 @@ public class TagController {
 
     @DeleteMapping("/{id}")
     @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<Tag>> deleteTag(@PathVariable("id") @Min(1L) Long id) throws ResourceNotFoundException, DaoException, ControllerException, ServiceException {
+    public ResponseEntity<RepresentationModel<Tag>> deleteTag(@PathVariable("id") @Min(1L) long id) throws ResourceNotFoundException, ControllerException, ServiceException, DaoException {
         ResponseEntity<RepresentationModel<Tag>> responseEntity;
         if (tagService.deleteById(id)) {
             RepresentationModel<Tag> representationModel = new RepresentationModel<>();
@@ -74,7 +73,7 @@ public class TagController {
 
     @PostMapping
     @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<Tag>> addTag(@Valid @RequestBody Tag tag) throws DaoException, ResourceNotFoundException, ControllerException, ServiceException {
+    public ResponseEntity<RepresentationModel<Tag>> addTag(@RequestBody Tag tag) throws ControllerException, ServiceException, ResourceNotFoundException, DaoException {
         ResponseEntity<RepresentationModel<Tag>> responseEntity;
         Tag addedTag = tagService.add(tag);
         hateoasBuilder.buildFullHateoas(addedTag);

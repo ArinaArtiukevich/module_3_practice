@@ -29,22 +29,22 @@ public class Order extends RepresentationModel<Order> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     @JsonView(View.UI.class)
-    private Long id;
+    private long id;
 
     @Column(name = "user_id")
     @Min(value = 0, message = "Id user should be positive.")
     @JsonView(View.REST.class)
-    private Long idUser;
+    private long idUser;
 
     @Column(name = "certificate_id")
     @Min(value = 0, message = "Id certificate should be positive.")
     @JsonView(View.UI.class)
-    private Long idCertificate;
+    private long idCertificate;
 
     @Column(name = "price")
     @Min(value = 0, message = "Price should be positive.")
     @JsonView(View.UI.class)
-    private Integer price;
+    private int price;
 
     @Column(name = "payment_date")
     @NotBlank(message = "Payment date should not be empty.")

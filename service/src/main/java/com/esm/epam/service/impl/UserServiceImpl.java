@@ -41,19 +41,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getById(Long id) throws ResourceNotFoundException, DaoException {
+    public User getById(long id) throws ResourceNotFoundException, DaoException {
         Optional<User> user = userDao.getById(id);
         userValidator.validateEntity(user, id);
         return user.get();
     }
 
     @Override
-    public User update(User user, Long idUser) throws DaoException, ResourceNotFoundException, ServiceException {
+    public User update(User user, long idUser) throws DaoException, ResourceNotFoundException, ServiceException {
         User updatedUser;
         Optional<Certificate> certificate;
         Optional<User> userBeforeUpdate = userDao.getById(idUser);
         userValidator.validateEntity(userBeforeUpdate, idUser);
-        certificate = getCertificate(user);
+        certificate = certificateDao.getById(user.getCertificates().get(0).getId());
         if (!certificate.isPresent()) {
             throw new ResourceNotFoundException("No such certificate");
         }
@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Order> getOrders(Long idUser, int page, int size) {
+    public List<Order> getOrders(long idUser, int page, int size) {
         return orderDao.getLimitedOrders(idUser, page, size);
     }
 
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
         return userDao.getMostWidelyUsedTag();
     }
 
-    private void validateUserHasCertificate(Long idUser, Optional<Certificate> certificate) throws DaoException {
+    private void validateUserHasCertificate(long idUser, Optional<Certificate> certificate) throws DaoException {
         List<Long> certificatesId = orderDao.getUserOrders(idUser).stream()
                 .map(Order::getIdCertificate)
                 .collect(Collectors.toList());
@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private Order getOrder(Long idUser, Optional<Certificate> certificate) {
+    private Order getOrder(long idUser, Optional<Certificate> certificate) {
         Order order = new Order();
         order.setIdUser(idUser);
         order.setIdCertificate(certificate.get().getId());
@@ -108,15 +108,4 @@ public class UserServiceImpl implements UserService {
         return order;
     }
 
-    private Optional<Certificate> getCertificate(User user) throws DaoException {
-        Optional<Certificate> certificate;
-        if (user.getCertificates().get(0).getId() != null) {
-            certificate = certificateDao.getById(user.getCertificates().get(0).getId());
-        } else if (user.getCertificates().get(0).getName() != null) {
-            certificate = certificateDao.getByName(user.getCertificates().get(0).getName());
-        } else {
-            throw new DaoException("Enter name or id of required certificate");
-        }
-        return certificate;
-    }
 }

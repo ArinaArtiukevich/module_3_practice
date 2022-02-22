@@ -36,7 +36,7 @@ public class Certificate extends RepresentationModel<Certificate> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @JsonView(View.UI.class)
-    private Long id;
+    private long id;
 
     @Column(name = "name", unique = true)
     @JsonView(View.UI.class)
@@ -49,12 +49,12 @@ public class Certificate extends RepresentationModel<Certificate> {
     @Column(name = "price")
     @JsonView(View.UI.class)
     @Min(value = 0, message = "Price should be positive.")
-    private Integer price;
+    private int price;
 
     @Column(name = "duration")
     @JsonView(View.UI.class)
     @Min(value = 0, message = "Duration should be positive.")
-    private Integer duration;
+    private int duration;
 
     @Column(name = "creation_date")
     @JsonView(View.REST.class)

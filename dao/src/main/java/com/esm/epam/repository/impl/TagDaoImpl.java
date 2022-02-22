@@ -50,7 +50,7 @@ public class TagDaoImpl implements CRDDao<Tag> {
     }
 
     @Override
-    public Optional<Tag> getById(Long id) throws DaoException {
+    public Optional<Tag> getById(long id) throws DaoException {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         return Optional.ofNullable(entityManager.find(Tag.class, id));
     }
@@ -72,7 +72,7 @@ public class TagDaoImpl implements CRDDao<Tag> {
     }
 
     @Override
-    public boolean deleteById(Long id) {
+    public boolean deleteById(long id) {
         boolean isDeleted = false;
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

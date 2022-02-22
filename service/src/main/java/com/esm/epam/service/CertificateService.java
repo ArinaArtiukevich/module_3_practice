@@ -14,5 +14,5 @@ public interface CertificateService extends CRUDService<Certificate> {
      * @param idTag is id of tag to be deleted
      * @return element with updated tags
      */
-    Optional<Certificate> deleteTag(Long id, Long idTag) throws DaoException, ResourceNotFoundException;
+    Optional<Certificate> deleteTag(long id, long idTag) throws DaoException, ResourceNotFoundException;
 }

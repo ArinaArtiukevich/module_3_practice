@@ -48,7 +48,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public Optional<User> getById(Long id) throws DaoException {
+    public Optional<User> getById(long id) throws DaoException {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         return Optional.ofNullable(entityManager.find(User.class, id));
     }
@@ -67,7 +67,7 @@ public class UserDaoImpl implements UserDao {
         Optional<Tag> tag = Optional.empty();
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        Long idUser = getIdUser(entityManager, criteriaBuilder);
+        long idUser = getIdUser(entityManager, criteriaBuilder);
 
         CriteriaQuery<Tag> criteriaQuery = criteriaBuilder.createQuery(Tag.class);
         Root<Tag> root = criteriaQuery.from(Tag.class);
@@ -87,8 +87,8 @@ public class UserDaoImpl implements UserDao {
 
     }
 
-    private Long getIdUser(EntityManager entityManager, CriteriaBuilder criteriaBuilder) throws DaoException {
-        Long idUser;
+    private long getIdUser(EntityManager entityManager, CriteriaBuilder criteriaBuilder) throws DaoException {
+        long idUser;
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Order> root = criteriaQuery.from(Order.class);
         criteriaQuery.select(root.get(ORDER_FIELD_USER_ID));

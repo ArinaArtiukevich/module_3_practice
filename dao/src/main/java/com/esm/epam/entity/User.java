@@ -21,6 +21,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class User extends RepresentationModel<User> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     @JsonView(View.UI.class)
-    private Long id;
+    private long id;
 
     @Column(name = "user_login", unique = true)
     @JsonView(View.UI.class)
@@ -49,7 +50,7 @@ public class User extends RepresentationModel<User> {
     @JsonView(View.UI.class)
     @NotNull(message = "Budget should not be null.")
     @Min(value = 0, message = "Budget should be positive.")
-    private Integer budget;
+    private int budget;
 
     @ManyToMany(cascade = {
             MERGE
@@ -57,6 +58,7 @@ public class User extends RepresentationModel<User> {
     @JoinTable(name = "orders",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "certificate_id")})
+    @NotEmpty
     @JsonView(View.UI.class)
     private List<Certificate> certificates;
 

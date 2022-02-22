@@ -47,7 +47,7 @@ public interface CRDService<T> {
      * @param id is required element id
      * @return required element
      */
-    T getById(Long id) throws ResourceNotFoundException, DaoException;
+    T getById(long id) throws ResourceNotFoundException, DaoException;
 
     /**
      * deletes element by id
@@ -55,5 +55,5 @@ public interface CRDService<T> {
      * @param id is required element id
      * @return true when element was deleted
      */
-    boolean deleteById(Long id) throws ResourceNotFoundException;
+    boolean deleteById(long id) throws ResourceNotFoundException;
 }

@@ -45,12 +45,12 @@ public class CertificateBuilderImpl implements Builder<Certificate> {
         } else {
             newCertificate.setDescription(currentObject.getDescription());
         }
-        if (objectToBeUpdated.getPrice() != null) {
+        if (objectToBeUpdated.getPrice() != 0) {
             newCertificate.setPrice(objectToBeUpdated.getPrice());
         } else {
             newCertificate.setPrice(currentObject.getPrice());
         }
-        if (objectToBeUpdated.getDuration() != null) {
+        if (objectToBeUpdated.getDuration() != 0) {
             newCertificate.setDuration(objectToBeUpdated.getDuration());
         } else {
             newCertificate.setDuration(currentObject.getDuration());
