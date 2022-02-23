@@ -3,10 +3,9 @@ package com.esm.epam.builder.impl;
 import com.esm.epam.builder.Builder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
-import com.esm.epam.exception.DaoException;
 import com.esm.epam.repository.CRDDao;
 import com.esm.epam.util.CurrentDate;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -14,18 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@AllArgsConstructor
 public class CertificateBuilderImpl implements Builder<Certificate> {
     private final CurrentDate date;
     private final CRDDao<Tag> tagDao;
 
-    @Autowired
-    public CertificateBuilderImpl(CurrentDate date, CRDDao<Tag> tagDao) {
-        this.date = date;
-        this.tagDao = tagDao;
-    }
-
     @Override
-    public Certificate buildObject(Certificate currentObject, Certificate objectToBeUpdated) throws DaoException {
+    public Certificate buildObject(Certificate currentObject, Certificate objectToBeUpdated) {
         Certificate newCertificate = new Certificate();
 
         newCertificate.setId(currentObject.getId());
@@ -67,30 +61,19 @@ public class CertificateBuilderImpl implements Builder<Certificate> {
     }
 
     private void addExistedTags(List<Tag> tags, List<Tag> currentTags) {
-        for (Tag tag : currentTags) {
-            if (!tags.contains(tag)) {
-                tags.add(tag);
-            }
-        }
+        currentTags.stream().filter(tag -> !tags.contains(tag)).forEach(tags::add);
     }
 
-    private void addNewTags(Certificate objectToBeUpdated, List<Tag> tags) throws DaoException {
+    private void addNewTags(Certificate objectToBeUpdated, List<Tag> tags) {
         List<Tag> tagsToBeAdded = objectToBeUpdated.getTags();
-        Optional<Tag> tagToBeAdded;
-        for (Tag tag : tagsToBeAdded) {
-            if (tag.getIdTag() == null && tag.getName() != null) {
-                tagToBeAdded = tagDao.getByName(tag.getName());
-                addTagToList(tagToBeAdded, tags, tag);
-            } else if (tag.getIdTag() != null && tag.getName() == null) {
-                tagToBeAdded = tagDao.getById(tag.getIdTag());
-                addTagToList(tagToBeAdded, tags, tag);
-            } else if (tag.getIdTag() != null && tag.getName() != null) {
-                tags.add(tag);
-            }
-        }
+        tagsToBeAdded.stream().filter(tag -> (tag.getIdTag() == null && tag.getName() != null)).forEach(tag -> addTagToList(tagDao.getByName(tag.getName()), tags));
+        tagsToBeAdded.stream().filter(tag -> (tag.getIdTag() != null && tag.getName() == null)).forEach(tag -> addTagToList(tagDao.getById(tag.getIdTag()), tags));
+        tagsToBeAdded.stream().filter(tag -> (tag.getIdTag() != null && tag.getName() != null)).forEach(tags::add);
+
     }
 
-    private void addTagToList(Optional<Tag> tagToBeAdded, List<Tag> tags, Tag tag) {
+
+    private void addTagToList(Optional<Tag> tagToBeAdded, List<Tag> tags) {
         if (tagToBeAdded.isPresent() && !tags.contains(tagToBeAdded.get())) {
             tags.add(tagToBeAdded.get());
         }

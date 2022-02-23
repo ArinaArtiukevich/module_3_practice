@@ -1,7 +1,5 @@
 package com.esm.epam.validator;
 
-import com.esm.epam.exception.ResourceNotFoundException;
-
 import java.util.Optional;
 
 /**
@@ -14,6 +12,6 @@ public interface ServiceValidator<T> {
      * @param t  is parameter to be validated
      * @param id is id of parameter
      */
-    void validateEntity(Optional<T> t, Long id) throws ResourceNotFoundException;
+    void validateEntity(Optional<T> t, Long id);
 
 }

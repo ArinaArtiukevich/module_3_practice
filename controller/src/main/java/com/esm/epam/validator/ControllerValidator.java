@@ -9,7 +9,7 @@ public class ControllerValidator {
     private ControllerValidator() {
     }
 
-    public static void validateSortValues(MultiValueMap<String, Object> params) throws ControllerException {
+    public static void validateSortValues(MultiValueMap<String, Object> params) {
         if (params.keySet().stream().anyMatch(key -> !SORT_KEYS.contains(key))) {
             throw new ControllerException("Invalid filter key.");
         }

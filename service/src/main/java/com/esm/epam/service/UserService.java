@@ -18,7 +18,7 @@ public interface UserService {
      * @param size the number of items to be returned
      * @return List with users
      */
-    List<User> getAll(int page, int size) throws ResourceNotFoundException;
+    List<User> getAll(int page, int size);
 
     /**
      * finds user by id
@@ -26,7 +26,7 @@ public interface UserService {
      * @param id is required element id
      * @return required element
      */
-    User getById(long id) throws ResourceNotFoundException, DaoException;
+    User getById(long id);
 
     /**
      * updates user budget
@@ -35,7 +35,7 @@ public interface UserService {
      * @param idUser is id of user to be updated
      * @return updated user
      */
-    User update(User user, long idUser) throws DaoException, ResourceNotFoundException, ServiceException;
+    User update(User user, long idUser);
 
     /**
      * finds orders by user id
@@ -52,5 +52,5 @@ public interface UserService {
      *
      * @return required tag
      */
-    Optional<Tag> getMostWidelyUsedTag() throws DaoException;
+    Optional<Tag> getMostWidelyUsedTag();
 }

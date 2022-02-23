@@ -25,12 +25,12 @@ import java.util.List;
 import static javax.persistence.CascadeType.MERGE;
 
 @Entity
-@Table(name = "gift_certificates")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "gift_certificates")
 public class Certificate extends RepresentationModel<Certificate> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

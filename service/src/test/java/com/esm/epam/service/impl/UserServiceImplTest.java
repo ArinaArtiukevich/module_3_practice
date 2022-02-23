@@ -4,9 +4,6 @@ import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.entity.User;
 import com.esm.epam.entity.audit.ModificationInformation;
-import com.esm.epam.exception.DaoException;
-import com.esm.epam.exception.ResourceNotFoundException;
-import com.esm.epam.exception.ServiceException;
 import com.esm.epam.repository.impl.CertificateDaoImpl;
 import com.esm.epam.repository.impl.OrderDaoImpl;
 import com.esm.epam.repository.impl.UserDaoImpl;
@@ -100,14 +97,14 @@ class UserServiceImplTest {
     private UserServiceImpl userService;
 
     @Test
-    void getAll_positive() throws ResourceNotFoundException {
+    void getAll_positive() {
         when(userDao.getAll(0, 1000)).thenReturn(users);
         List<User> actualUsers = userService.getAll(0, 1000);
         assertEquals(users, actualUsers);
     }
 
     @Test
-    void getById() throws DaoException, ResourceNotFoundException {
+    void getById() {
         User expectedUser = users.get(1);
         when(userDao.getById(1L)).thenReturn(Optional.ofNullable(users.get(1)));
         User actualUser = userService.getById(1L);
@@ -116,7 +113,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void update() throws DaoException, ServiceException, ResourceNotFoundException {
+    void update() {
         ModificationInformation modificationInformation = new ModificationInformation();
         modificationInformation.setCreatedEntityBy("arina");
         modificationInformation.setCreationEntityDate(LocalDateTime.of(2022, 2,20,9,10));
@@ -170,7 +167,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getMostWidelyUsedTag() throws DaoException {
+    void getMostWidelyUsedTag() {
         Tag expectedTag = new Tag(2L, "tag_name");
         doReturn(Optional.of(expectedTag)).when(userDao).getMostWidelyUsedTag();
         Optional<Tag> actualTag = userService.getMostWidelyUsedTag();

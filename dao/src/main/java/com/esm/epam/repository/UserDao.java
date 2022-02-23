@@ -2,7 +2,6 @@ package com.esm.epam.repository;
 
 import com.esm.epam.entity.Tag;
 import com.esm.epam.entity.User;
-import com.esm.epam.exception.DaoException;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +22,7 @@ public interface UserDao {
      * @param id is required element id
      * @return required element
      */
-    Optional<User> getById(long id) throws DaoException;
+    Optional<User> getById(long id);
 
     /**
      * updates user budget
@@ -38,5 +37,5 @@ public interface UserDao {
      *
      * @return required tag
      */
-    Optional<Tag> getMostWidelyUsedTag() throws DaoException;
+    Optional<Tag> getMostWidelyUsedTag();
 }

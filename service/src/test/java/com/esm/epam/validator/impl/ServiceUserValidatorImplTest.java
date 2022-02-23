@@ -50,7 +50,7 @@ class ServiceUserValidatorImplTest {
     }
 
     @Test
-    void validateUser_positive() throws ResourceNotFoundException {
+    void validateUser_positive() {
         userValidator.validateEntity(Optional.ofNullable(user), 1L);
     }
 

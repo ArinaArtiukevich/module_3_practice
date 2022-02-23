@@ -13,6 +13,7 @@ import com.esm.epam.repository.UserDao;
 import com.esm.epam.service.UserService;
 import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.ServiceValidator;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
     private final ServiceValidator<User> userValidator;
     private final UserDao userDao;
@@ -27,28 +29,20 @@ public class UserServiceImpl implements UserService {
     private final CertificateDao certificateDao;
     private final CurrentDate date;
 
-    public UserServiceImpl(ServiceValidator<User> userValidator, UserDao userDao, OrderDao orderDao, CertificateDao certificateDao, CurrentDate date) {
-        this.userValidator = userValidator;
-        this.userDao = userDao;
-        this.orderDao = orderDao;
-        this.certificateDao = certificateDao;
-        this.date = date;
-    }
-
     @Override
-    public List<User> getAll(int page, int size) throws ResourceNotFoundException {
+    public List<User> getAll(int page, int size) {
         return userDao.getAll(page, size);
     }
 
     @Override
-    public User getById(long id) throws ResourceNotFoundException, DaoException {
+    public User getById(long id) {
         Optional<User> user = userDao.getById(id);
         userValidator.validateEntity(user, id);
         return user.get();
     }
 
     @Override
-    public User update(User user, long idUser) throws DaoException, ResourceNotFoundException, ServiceException {
+    public User update(User user, long idUser) {
         User updatedUser;
         Optional<Certificate> certificate;
         Optional<User> userBeforeUpdate = userDao.getById(idUser);
@@ -86,11 +80,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<Tag> getMostWidelyUsedTag() throws DaoException {
+    public Optional<Tag> getMostWidelyUsedTag() {
         return userDao.getMostWidelyUsedTag();
     }
 
-    private void validateUserHasCertificate(long idUser, Optional<Certificate> certificate) throws DaoException {
+    private void validateUserHasCertificate(long idUser, Optional<Certificate> certificate) {
         List<Long> certificatesId = orderDao.getUserOrders(idUser).stream()
                 .map(Order::getIdCertificate)
                 .collect(Collectors.toList());

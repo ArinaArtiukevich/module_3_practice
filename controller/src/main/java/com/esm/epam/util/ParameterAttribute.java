@@ -6,7 +6,6 @@ import java.util.List;
 public class ParameterAttribute {
     private ParameterAttribute() {
     }
-
     public static final String TAG = "tag";
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";

@@ -2,6 +2,7 @@ package com.esm.epam.repository.impl;
 
 import com.esm.epam.entity.Order;
 import com.esm.epam.repository.OrderDao;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -14,12 +15,9 @@ import java.util.List;
 import static com.esm.epam.util.ParameterAttribute.ORDER_FIELD_USER_ID;
 
 @Repository
+@AllArgsConstructor
 public class OrderDaoImpl implements OrderDao {
     private final EntityManagerFactory entityManagerFactory;
-
-    public OrderDaoImpl(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
-    }
 
     @Override
     public void addOrder(Order order) {

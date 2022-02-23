@@ -1,7 +1,6 @@
 package com.esm.epam.repository;
 
 import com.esm.epam.entity.Order;
-import com.esm.epam.exception.DaoException;
 
 import java.util.List;
 
@@ -11,7 +10,7 @@ public interface OrderDao {
      *
      * @param order is element to be added
      */
-    void addOrder(Order order) throws DaoException;
+    void addOrder(Order order);
 
     /**
      * finds orders by user id

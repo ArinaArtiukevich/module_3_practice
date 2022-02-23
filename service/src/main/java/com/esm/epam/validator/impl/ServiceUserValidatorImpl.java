@@ -10,7 +10,7 @@ import java.util.Optional;
 @Component
 public class ServiceUserValidatorImpl implements ServiceValidator<User> {
     @Override
-    public void validateEntity(Optional<User> user, Long id) throws ResourceNotFoundException {
+    public void validateEntity(Optional<User> user, Long id) {
         if (!user.isPresent()) {
             throw new ResourceNotFoundException("No such user with id = " + id);
         }

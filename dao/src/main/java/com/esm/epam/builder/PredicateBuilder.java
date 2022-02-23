@@ -9,10 +9,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
-/**
- * @param <T> describes type parameter
- */
-public interface PredicateBuilder<T> {
+public interface PredicateBuilder {
     /**
      * gets predicates to build query
      *

@@ -4,13 +4,10 @@ import com.esm.epam.entity.Order;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.entity.User;
 import com.esm.epam.entity.View;
-import com.esm.epam.exception.ControllerException;
-import com.esm.epam.exception.DaoException;
-import com.esm.epam.exception.ResourceNotFoundException;
-import com.esm.epam.exception.ServiceException;
 import com.esm.epam.hateoas.HateoasBuilder;
 import com.esm.epam.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.AllArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -31,29 +28,22 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping("/users")
 @Validated
+@AllArgsConstructor
 public class UserController {
-
     private final UserService userService;
     private final HateoasBuilder<User> hateoasBuilder;
 
-    public UserController(UserService userService, HateoasBuilder<User> hateoasBuilder) {
-        this.userService = userService;
-        this.hateoasBuilder = hateoasBuilder;
-    }
-
     @GetMapping
     @JsonView(View.UI.class)
-    public ResponseEntity<List<User>> getUserList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) throws ControllerException, ServiceException, ResourceNotFoundException, DaoException {
+    public ResponseEntity<List<User>> getUserList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
         List<User> users = userService.getAll(page, size);
-        for (User user : users) {
-            hateoasBuilder.buildFullHateoas(user);
-        }
+        users.forEach(hateoasBuilder::buildFullHateoas);
         return new ResponseEntity<>(users, OK);
     }
 
     @GetMapping("/{id}")
     @JsonView(View.UI.class)
-    public ResponseEntity<User> getUser(@PathVariable("id") @Min(1L) long id) throws ControllerException, ServiceException, ResourceNotFoundException, DaoException {
+    public ResponseEntity<User> getUser(@PathVariable("id") @Min(1L) long id) {
         User user = userService.getById(id);
         hateoasBuilder.buildFullHateoas(user);
         return new ResponseEntity<>(user, OK);
@@ -61,17 +51,15 @@ public class UserController {
 
     @GetMapping(value = "/{id}/orders")
     @JsonView(View.UI.class)
-    public ResponseEntity<List<Order>> getUserOrders(@PathVariable("id") @Min(1L) long id, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) throws ControllerException, ServiceException, ResourceNotFoundException, DaoException {
+    public ResponseEntity<List<Order>> getUserOrders(@PathVariable("id") @Min(1L) long id, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
         List<Order> orders = userService.getOrders(id, page, size);
-        for (Order order : orders) {
-            hateoasBuilder.buildDefaultHateoas(order);
-        }
+        orders.forEach(hateoasBuilder::buildDefaultHateoas);
         return new ResponseEntity<>(orders, OK);
     }
 
     @PatchMapping("/{id}")
     @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<User>> updateUser(@PathVariable("id") @Min(1L) long id, @RequestBody User user) throws ControllerException, ServiceException, ResourceNotFoundException, DaoException {
+    public ResponseEntity<RepresentationModel<User>> updateUser(@PathVariable("id") @Min(1L) long id, @RequestBody User user) {
         User updatedUser = userService.update(user, id);
         hateoasBuilder.buildFullHateoas(updatedUser);
         return new ResponseEntity<>(updatedUser, OK);
@@ -79,7 +67,7 @@ public class UserController {
 
     @GetMapping("/mostWidelyUsedTag")
     @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<Tag>> getMostWidelyUsedTag() throws ControllerException, ServiceException, ResourceNotFoundException, DaoException {
+    public ResponseEntity<RepresentationModel<Tag>> getMostWidelyUsedTag() {
         ResponseEntity<RepresentationModel<Tag>> responseEntity;
         Optional<Tag> requiredTag = userService.getMostWidelyUsedTag();
         if (requiredTag.isPresent()) {

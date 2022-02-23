@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class ServiceException extends Exception {
+public class ServiceException extends RuntimeException {
     private String message;
 }

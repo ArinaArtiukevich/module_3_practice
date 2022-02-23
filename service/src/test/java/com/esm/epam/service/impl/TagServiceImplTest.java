@@ -1,8 +1,6 @@
 package com.esm.epam.service.impl;
 
 import com.esm.epam.entity.Tag;
-import com.esm.epam.exception.DaoException;
-import com.esm.epam.exception.ResourceNotFoundException;
 import com.esm.epam.repository.impl.TagDaoImpl;
 import com.esm.epam.validator.impl.ServiceTagValidatorImpl;
 import org.junit.jupiter.api.Test;
@@ -42,21 +40,21 @@ class TagServiceImplTest {
     );
 
     @Test
-    public void testGetAll_positive() throws ResourceNotFoundException {
+    public void testGetAll_positive() {
         when(tagDao.getAll(0, 1000)).thenReturn(tags);
         List<Tag> actualTags = tagService.getAll(0, 1000);
         assertEquals(tags, actualTags);
     }
 
     @Test
-    public void testAdd_positive() throws DaoException {
+    public void testAdd_positive() {
         when(tagDao.add(newTag)).thenReturn(tag);
         Tag actualTag = tagService.add(newTag);
         assertEquals(tag, actualTag);
     }
 
     @Test
-    public void testGetById_positive() throws ResourceNotFoundException, DaoException {
+    public void testGetById_positive() {
         when(tagDao.getById(1L)).thenReturn(Optional.ofNullable(tag));
         Tag actualTag = tagService.getById(1L);
         assertEquals(tag, actualTag);

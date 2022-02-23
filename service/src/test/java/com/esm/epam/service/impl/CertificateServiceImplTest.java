@@ -3,9 +3,6 @@ package com.esm.epam.service.impl;
 import com.esm.epam.builder.Builder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
-import com.esm.epam.exception.DaoException;
-import com.esm.epam.exception.ResourceNotFoundException;
-import com.esm.epam.exception.ServiceException;
 import com.esm.epam.repository.impl.CertificateDaoImpl;
 import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.impl.ServiceCertificateValidatorImpl;
@@ -55,7 +52,7 @@ class CertificateServiceImplTest {
             .description("playing football")
             .build();
     private final Certificate newCertificate = Certificate.builder()
-            .id(null)
+            .id(5L)
             .name("tennis")
             .description("playing tennis")
             .price(204)
@@ -95,7 +92,7 @@ class CertificateServiceImplTest {
     );
 
     @Test
-    void testUpdate_positive() throws DaoException, ResourceNotFoundException {
+    void testUpdate_positive() {
         Certificate expectedCertificate = Certificate.builder().id(1L)
                 .name("football")
                 .description("playing football")
@@ -120,7 +117,7 @@ class CertificateServiceImplTest {
     }
 
     @Test
-    void testGetAll_positive() throws ResourceNotFoundException {
+    void testGetAll_positive() {
         when(certificateDao.getAll(0, 1000)).thenReturn(certificates);
         List<Certificate> actualCertificates = certificateService.getAll(0, 1000);
         assertEquals(certificates, actualCertificates);
@@ -128,7 +125,7 @@ class CertificateServiceImplTest {
 
 
     @Test
-    public void testAdd_positive() throws DaoException {
+    public void testAdd_positive() {
         Long newId = 5L;
         Certificate addedCertificate = Certificate.builder()
                 .id(newId)
@@ -144,7 +141,7 @@ class CertificateServiceImplTest {
 
 
     @Test
-    public void testGetById_positive() throws ResourceNotFoundException, DaoException {
+    public void testGetById_positive() {
         when(certificateDao.getById(1L)).thenReturn(Optional.ofNullable(certificate));
         Certificate actualCertificate = certificateService.getById(1L);
         assertEquals(certificate, actualCertificate);
@@ -169,7 +166,7 @@ class CertificateServiceImplTest {
     }
 
     @Test
-    void testGetFilteredList_filterByPartName() throws ResourceNotFoundException, ServiceException, DaoException {
+    void testGetFilteredList_filterByPartName() {
         String partName = "ing";
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("name", partName);
@@ -187,7 +184,7 @@ class CertificateServiceImplTest {
     }
 
     @Test
-    void testDeleteTag_positive() throws DaoException, ResourceNotFoundException {
+    void testDeleteTag_positive() {
         Certificate certificateBefore = Certificate.builder()
                 .id(1L)
                 .name("skiing")

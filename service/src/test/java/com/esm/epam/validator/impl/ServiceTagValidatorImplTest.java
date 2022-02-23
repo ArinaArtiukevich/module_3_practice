@@ -29,7 +29,7 @@ class ServiceTagValidatorImplTest {
     }
 
     @Test
-    void validateEntity_positive() throws ResourceNotFoundException {
+    void validateEntity_positive() {
         tagValidator.validateEntity(Optional.ofNullable(tag), 1L);
     }
 

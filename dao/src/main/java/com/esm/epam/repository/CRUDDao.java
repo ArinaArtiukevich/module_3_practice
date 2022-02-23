@@ -1,7 +1,5 @@
 package com.esm.epam.repository;
 
-import com.esm.epam.exception.DaoException;
-
 public interface CRUDDao<T> extends CRDDao<T> {
     /**
      * updates element by id
@@ -9,5 +7,5 @@ public interface CRUDDao<T> extends CRDDao<T> {
      * @param t is element with fields to be updated
      * @return updated element
      */
-    T update(T t) throws DaoException;
+    T update(T t);
 }

@@ -4,7 +4,7 @@ import com.esm.epam.builder.PredicateBuilder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.repository.CertificateDao;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.MultiValueMap;
 
@@ -23,15 +23,10 @@ import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_FIELD_ID;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_FIELD_NAME;
 
 @Repository
+@AllArgsConstructor
 public class CertificateDaoImpl implements CertificateDao {
-    private final PredicateBuilder<Certificate> predicateBuilder;
+    private final PredicateBuilder predicateBuilder;
     private final EntityManagerFactory entityManagerFactory;
-
-    @Autowired
-    public CertificateDaoImpl(PredicateBuilder<Certificate> predicateBuilder, EntityManagerFactory entityManagerFactory) {
-        this.predicateBuilder = predicateBuilder;
-        this.entityManagerFactory = entityManagerFactory;
-    }
 
     @Override
     public List<Certificate> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
@@ -60,7 +55,7 @@ public class CertificateDaoImpl implements CertificateDao {
     }
 
     @Override
-    public Certificate update(Certificate certificate) throws DaoException {
+    public Certificate update(Certificate certificate) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
         Certificate updatedCertificate = entityManager.merge(certificate);
@@ -69,7 +64,7 @@ public class CertificateDaoImpl implements CertificateDao {
     }
 
     @Override
-    public Certificate add(Certificate certificate) throws DaoException {
+    public Certificate add(Certificate certificate) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
         entityManager.persist(certificate);
@@ -83,7 +78,7 @@ public class CertificateDaoImpl implements CertificateDao {
     }
 
     @Override
-    public Optional<Certificate> getById(long id) throws DaoException {
+    public Optional<Certificate> getById(long id) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         return Optional.ofNullable(entityManager.find(Certificate.class, id));
     }
@@ -105,7 +100,7 @@ public class CertificateDaoImpl implements CertificateDao {
     }
 
     @Override
-    public Optional<Certificate> deleteTag(long id, long idTag) throws DaoException {
+    public Optional<Certificate> deleteTag(long id, long idTag) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
         Certificate certificate = entityManager.find(Certificate.class, id);
