@@ -1,12 +1,13 @@
 package com.esm.epam.controller;
 
 import com.esm.epam.entity.Tag;
-import com.esm.epam.entity.View;
 import com.esm.epam.hateoas.HateoasBuilder;
+import com.esm.epam.model.representation.TagRepresentation;
 import com.esm.epam.service.CRDService;
-import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.Min;
-import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -32,33 +32,30 @@ import static org.springframework.http.HttpStatus.OK;
 @AllArgsConstructor
 public class TagController {
     private final CRDService<Tag> tagService;
-    private final HateoasBuilder<Tag> hateoasBuilder;
-
+    private final HateoasBuilder<TagRepresentation> hateoasBuilder;
+    private final RepresentationModelAssembler<Tag, TagRepresentation> tagRepresentationAssembler;
 
     @GetMapping
     @ResponseStatus(OK)
-    @JsonView(View.UI.class)
-    public List<Tag> getTagList(@RequestParam("page") @Min(1) int page, @RequestParam("size") @Min(1) int size) {
-        List<Tag> tags = tagService.getAll(page, size);
-        tags.forEach(hateoasBuilder::buildFullHateoas);
-        return tags;
+    public CollectionModel<TagRepresentation> getTagList(@RequestParam("page") @Min(1) int page, @RequestParam("size") @Min(1) int size) {
+        CollectionModel<TagRepresentation> tagsRepresentation = tagRepresentationAssembler.toCollectionModel(tagService.getAll(page, size));
+        tagsRepresentation.forEach(hateoasBuilder::buildFullHateoas);
+        return tagsRepresentation;
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(OK)
-    @JsonView(View.UI.class)
-    public Tag getTag(@PathVariable("id") @Min(1L) long id) {
-        Tag tag = tagService.getById(id);
-        hateoasBuilder.buildFullHateoas(tag);
-        return tag;
+    public TagRepresentation getTag(@PathVariable("id") @Min(1L) long id) {
+        TagRepresentation tagRepresentation = tagRepresentationAssembler.toModel(tagService.getById(id));
+        hateoasBuilder.buildFullHateoas(tagRepresentation);
+        return tagRepresentation;
     }
 
     @DeleteMapping("/{id}")
-    @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<Tag>> deleteTag(@PathVariable("id") @Min(1L) long id) {
-        ResponseEntity<RepresentationModel<Tag>> responseEntity;
+    public ResponseEntity<RepresentationModel<TagRepresentation>> deleteTag(@PathVariable("id") @Min(1L) long id) {
+        ResponseEntity<RepresentationModel<TagRepresentation>> responseEntity;
         if (tagService.deleteById(id)) {
-            RepresentationModel<Tag> representationModel = new RepresentationModel<>();
+            RepresentationModel<TagRepresentation> representationModel = new RepresentationModel<>();
             hateoasBuilder.buildDefaultHateoas(representationModel);
             responseEntity = new ResponseEntity<>(representationModel, NO_CONTENT);
         } else {
@@ -69,11 +66,10 @@ public class TagController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    @JsonView(View.UI.class)
-    public RepresentationModel<Tag> addTag(@RequestBody Tag tag) {
-        Tag addedTag = tagService.add(tag);
-        hateoasBuilder.buildFullHateoas(addedTag);
-        return addedTag;
+    public RepresentationModel<TagRepresentation> addTag(@RequestBody Tag tag) {
+        TagRepresentation addedTagRepresentation = tagRepresentationAssembler.toModel(tagService.add(tag));
+        hateoasBuilder.buildFullHateoas(addedTagRepresentation);
+        return addedTagRepresentation;
     }
 
 }

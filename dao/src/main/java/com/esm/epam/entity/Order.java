@@ -1,12 +1,10 @@
 package com.esm.epam.entity;
 
 import com.esm.epam.entity.audit.ModificationInformation;
-import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -24,31 +22,26 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "orders")
-public class Order extends RepresentationModel<Order> {
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
-    @JsonView(View.UI.class)
     private long id;
 
     @Column(name = "user_id")
     @Min(value = 0, message = "Id user should be positive.")
-    @JsonView(View.REST.class)
     private long idUser;
 
     @Column(name = "certificate_id")
     @Min(value = 0, message = "Id certificate should be positive.")
-    @JsonView(View.UI.class)
     private long idCertificate;
 
     @Column(name = "price")
     @Min(value = 0, message = "Price should be positive.")
-    @JsonView(View.UI.class)
     private int price;
 
     @Column(name = "payment_date")
     @NotBlank(message = "Payment date should not be empty.")
-    @JsonView(View.UI.class)
     private String paymentDate;
 
     @Embedded

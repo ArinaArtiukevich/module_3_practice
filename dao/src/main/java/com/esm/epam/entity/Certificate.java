@@ -1,13 +1,11 @@
 package com.esm.epam.entity;
 
 import com.esm.epam.entity.audit.ModificationInformation;
-import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -31,37 +29,30 @@ import static javax.persistence.CascadeType.MERGE;
 @AllArgsConstructor
 @Builder
 @Table(name = "gift_certificates")
-public class Certificate extends RepresentationModel<Certificate> {
+public class Certificate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @JsonView(View.UI.class)
     private long id;
 
     @Column(name = "name", unique = true)
-    @JsonView(View.UI.class)
     private String name;
 
     @Column(name = "description")
-    @JsonView(View.UI.class)
     private String description;
 
     @Column(name = "price")
-    @JsonView(View.UI.class)
     @Min(value = 0, message = "Price should be positive.")
     private int price;
 
     @Column(name = "duration")
-    @JsonView(View.UI.class)
     @Min(value = 0, message = "Duration should be positive.")
     private int duration;
 
     @Column(name = "creation_date")
-    @JsonView(View.UI.class)
     private String createDate;
 
     @Column(name = "last_update_date")
-    @JsonView(View.UI.class)
     private String lastUpdateDate;
 
     @ManyToMany(cascade = {
@@ -70,11 +61,9 @@ public class Certificate extends RepresentationModel<Certificate> {
     @JoinTable(name = "certificates_tags",
             joinColumns = {@JoinColumn(name = "certificate_id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id")})
-    @JsonView(View.UI.class)
     private List<Tag> tags;
 
     @ManyToMany(mappedBy = "certificates")
-    @JsonView(View.REST.class)
     private List<User> userList;
 
     @Embedded
