@@ -2,6 +2,7 @@ package com.esm.epam.builder.impl;
 
 import com.esm.epam.builder.PredicateBuilder;
 import com.esm.epam.entity.Certificate;
+import com.esm.epam.exception.DaoException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
@@ -50,6 +51,8 @@ public class CertificatePredicateBuilderImpl implements PredicateBuilder {
                     break;
                 case SORT_STATEMENT:
                     sortByParameter(params, criteriaBuilder, criteriaQuery, root, entry);
+                default:
+                    throw new DaoException("Invalid filter key.");
             }
         });
         return predicates;
