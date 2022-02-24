@@ -4,10 +4,10 @@ import com.esm.epam.builder.Builder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.repository.CRDDao;
-import com.esm.epam.util.CurrentDate;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +15,6 @@ import java.util.Optional;
 @Component
 @AllArgsConstructor
 public class CertificateBuilderImpl implements Builder<Certificate> {
-    private final CurrentDate date;
     private final CRDDao<Tag> tagDao;
 
     @Override
@@ -23,7 +22,7 @@ public class CertificateBuilderImpl implements Builder<Certificate> {
         Certificate newCertificate = new Certificate();
 
         newCertificate.setId(currentObject.getId());
-        newCertificate.setLastUpdateDate(date.getCurrentDate());
+        newCertificate.setLastUpdateDate(LocalDateTime.now().toString());
         newCertificate.setCreateDate(currentObject.getCreateDate());
         newCertificate.getModificationInformation().setCreatedEntityBy(currentObject.getModificationInformation().getCreatedEntityBy());
         newCertificate.getModificationInformation().setCreationEntityDate(currentObject.getModificationInformation().getCreationEntityDate());
@@ -66,9 +65,9 @@ public class CertificateBuilderImpl implements Builder<Certificate> {
 
     private void addNewTags(Certificate objectToBeUpdated, List<Tag> tags) {
         List<Tag> tagsToBeAdded = objectToBeUpdated.getTags();
-        tagsToBeAdded.stream().filter(tag -> (tag.getIdTag() == null && tag.getName() != null)).forEach(tag -> addTagToList(tagDao.getByName(tag.getName()), tags));
-        tagsToBeAdded.stream().filter(tag -> (tag.getIdTag() != null && tag.getName() == null)).forEach(tag -> addTagToList(tagDao.getById(tag.getIdTag()), tags));
-        tagsToBeAdded.stream().filter(tag -> (tag.getIdTag() != null && tag.getName() != null)).forEach(tags::add);
+        tagsToBeAdded.stream().filter(tag -> (tag.getId() == null && tag.getName() != null)).forEach(tag -> addTagToList(tagDao.getByName(tag.getName()), tags));
+        tagsToBeAdded.stream().filter(tag -> (tag.getId() != null && tag.getName() == null)).forEach(tag -> addTagToList(tagDao.getById(tag.getId()), tags));
+        tagsToBeAdded.stream().filter(tag -> (tag.getId() != null && tag.getName() != null)).forEach(tags::add);
 
     }
 

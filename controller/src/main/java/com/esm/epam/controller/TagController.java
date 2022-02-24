@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.Min;
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
@@ -36,7 +38,7 @@ public class TagController {
     @GetMapping
     @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public List<Tag> getTagList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
+    public List<Tag> getTagList(@RequestParam("page") @Min(1) int page, @RequestParam("size") @Min(1) int size) {
         List<Tag> tags = tagService.getAll(page, size);
         tags.forEach(hateoasBuilder::buildFullHateoas);
         return tags;
@@ -58,15 +60,15 @@ public class TagController {
         if (tagService.deleteById(id)) {
             RepresentationModel<Tag> representationModel = new RepresentationModel<>();
             hateoasBuilder.buildDefaultHateoas(representationModel);
-            responseEntity = new ResponseEntity<>(representationModel, OK);
+            responseEntity = new ResponseEntity<>(representationModel, NO_CONTENT);
         } else {
-            responseEntity = ResponseEntity.noContent().build();
+            responseEntity = ResponseEntity.notFound().build();
         }
         return responseEntity;
     }
 
     @PostMapping
-    @ResponseStatus(OK)
+    @ResponseStatus(CREATED)
     @JsonView(View.UI.class)
     public RepresentationModel<Tag> addTag(@RequestBody Tag tag) {
         Tag addedTag = tagService.add(tag);

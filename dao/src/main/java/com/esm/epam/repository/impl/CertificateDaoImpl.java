@@ -103,7 +103,7 @@ public class CertificateDaoImpl implements CertificateDao {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
         Certificate certificate = entityManager.find(Certificate.class, id);
-        certificate.getTags().removeIf(tag -> (tag.getIdTag().equals(idTag)));
+        certificate.getTags().removeIf(tag -> (tag.getId().equals(idTag)));
         entityManager.getTransaction().commit();
         return getById(id);
     }

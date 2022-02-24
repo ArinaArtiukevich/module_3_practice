@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.esm.epam.validator.ControllerValidator.validateSortValues;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 
@@ -40,7 +42,7 @@ public class CertificateController {
     @GetMapping
     @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public List<Certificate> getCertificateList(@RequestParam(required = false) MultiValueMap<String, Object> params, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
+    public List<Certificate> getCertificateList(@RequestParam(required = false) MultiValueMap<String, Object> params, @RequestParam("page") @Min(1) int page, @RequestParam("size") @Min(1) int size) {
         validateSortValues(params);
         List<Certificate> certificates = certificateService.getCertificates(params, page, size);
         certificates.forEach(hateoasBuilder::buildFullHateoas);
@@ -64,9 +66,9 @@ public class CertificateController {
         Optional<Certificate> updatedCertificate = certificateService.deleteTag(id, tagId);
         if (updatedCertificate.isPresent()) {
             hateoasBuilder.buildFullHateoas(updatedCertificate.get());
-            responseEntity = new ResponseEntity<>(updatedCertificate.get(), OK);
+            responseEntity = new ResponseEntity<>(updatedCertificate.get(), NO_CONTENT);
         } else {
-            responseEntity = ResponseEntity.noContent().build();
+            responseEntity = ResponseEntity.notFound().build();
         }
         return responseEntity;
     }
@@ -78,15 +80,15 @@ public class CertificateController {
         if (certificateService.deleteById(id)) {
             RepresentationModel<Certificate> representationModel = new RepresentationModel<>();
             hateoasBuilder.buildDefaultHateoas(representationModel);
-            responseEntity = new ResponseEntity<>(representationModel, OK);
+            responseEntity = new ResponseEntity<>(representationModel, NO_CONTENT);
         } else {
-            responseEntity = ResponseEntity.noContent().build();
+            responseEntity = ResponseEntity.notFound().build();
         }
         return responseEntity;
     }
 
     @PostMapping
-    @ResponseStatus(OK)
+    @ResponseStatus(CREATED)
     @JsonView(View.UI.class)
     public RepresentationModel<Certificate> addCertificate(@RequestBody Certificate certificate) {
         Certificate addedCertificate = certificateService.add(certificate);

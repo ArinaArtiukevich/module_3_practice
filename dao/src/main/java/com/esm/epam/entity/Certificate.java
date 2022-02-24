@@ -57,11 +57,11 @@ public class Certificate extends RepresentationModel<Certificate> {
     private int duration;
 
     @Column(name = "creation_date")
-    @JsonView(View.REST.class)
+    @JsonView(View.UI.class)
     private String createDate;
 
     @Column(name = "last_update_date")
-    @JsonView(View.REST.class)
+    @JsonView(View.UI.class)
     private String lastUpdateDate;
 
     @ManyToMany(cascade = {

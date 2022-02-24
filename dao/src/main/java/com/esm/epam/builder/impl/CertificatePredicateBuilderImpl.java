@@ -3,7 +3,6 @@ package com.esm.epam.builder.impl;
 import com.esm.epam.builder.PredicateBuilder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.exception.DaoException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 
@@ -14,6 +13,7 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_DESCRIPTION;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_FIELD_DATE;
@@ -25,13 +25,13 @@ import static com.esm.epam.util.ParameterAttribute.DATE_PARAMETER;
 import static com.esm.epam.util.ParameterAttribute.DESC_STATEMENT;
 import static com.esm.epam.util.ParameterAttribute.DIRECTION_PARAMETER;
 import static com.esm.epam.util.ParameterAttribute.NAME_PARAMETER;
+import static com.esm.epam.util.ParameterAttribute.PAGE_PARAMETER;
 import static com.esm.epam.util.ParameterAttribute.PERCENT_SYMBOL;
+import static com.esm.epam.util.ParameterAttribute.SIZE_PARAMETER;
 import static com.esm.epam.util.ParameterAttribute.SORT_STATEMENT;
 import static com.esm.epam.util.ParameterAttribute.TAG;
 
-
 @Component
-@Qualifier
 public class CertificatePredicateBuilderImpl implements PredicateBuilder {
 
     @Override
@@ -51,8 +51,12 @@ public class CertificatePredicateBuilderImpl implements PredicateBuilder {
                     break;
                 case SORT_STATEMENT:
                     sortByParameter(params, criteriaBuilder, criteriaQuery, root, entry);
+                    break;
                 default:
-                    throw new DaoException("Invalid filter key.");
+                    if (!Objects.equals(entry.getKey(), DIRECTION_PARAMETER) && !Objects.equals(entry.getKey(), PAGE_PARAMETER) && !Objects.equals(entry.getKey(), SIZE_PARAMETER)) {
+                        throw new DaoException("Invalid filter key.");
+                    }
+                    break;
             }
         });
         return predicates;

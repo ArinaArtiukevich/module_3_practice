@@ -8,12 +8,12 @@ import com.esm.epam.exception.ServiceException;
 import com.esm.epam.repository.CRDDao;
 import com.esm.epam.repository.CertificateDao;
 import com.esm.epam.service.CertificateService;
-import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.ServiceValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +26,6 @@ public class CertificateServiceImpl implements CertificateService {
     private final CertificateDao certificateDao;
     private final CRDDao<Tag> tagDao;
     private final ServiceValidator<Certificate> validator;
-    private final CurrentDate date;
     private final Builder<Certificate> certificateBuilder;
 
     @Override
@@ -44,11 +43,12 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public List<Certificate> getCertificates(MultiValueMap<String, Object> params, int page, int size) {
+        int actualPage = page - 1;
         List<Certificate> certificates;
         if (params.size() == 2) {
-            certificates = getAll(page, size);
+            certificates = getAll(actualPage, size);
         } else {
-            certificates = getFilteredList(params, page, size);
+            certificates = getFilteredList(params, actualPage, size);
         }
         return certificates;
     }
@@ -60,7 +60,7 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public Certificate add(Certificate certificate) {
-        certificate.setCreateDate(date.getCurrentDate());
+        certificate.setCreateDate(LocalDateTime.now().toString());
         return certificateDao.add(certificate);
     }
 
@@ -87,7 +87,7 @@ public class CertificateServiceImpl implements CertificateService {
         Optional<Certificate> certificate = certificateDao.getById(id);
         validator.validateEntity(certificate, id);
         certificate.get().getTags().stream()
-                .filter(localTag -> idTag == localTag.getIdTag())
+                .filter(localTag -> idTag == localTag.getId())
                 .findAny()
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Requested tag resource not found id = %d", idTag)));
         return certificateDao.deleteTag(id, idTag);

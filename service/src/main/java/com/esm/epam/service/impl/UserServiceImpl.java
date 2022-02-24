@@ -11,11 +11,11 @@ import com.esm.epam.repository.CertificateDao;
 import com.esm.epam.repository.OrderDao;
 import com.esm.epam.repository.UserDao;
 import com.esm.epam.service.UserService;
-import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.ServiceValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,11 +27,10 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final OrderDao orderDao;
     private final CertificateDao certificateDao;
-    private final CurrentDate date;
 
     @Override
     public List<User> getAll(int page, int size) {
-        return userDao.getAll(page, size);
+        return userDao.getAll(page - 1, size);
     }
 
     @Override
@@ -76,7 +75,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Order> getOrders(long idUser, int page, int size) {
-        return orderDao.getLimitedOrders(idUser, page, size);
+        return orderDao.getLimitedOrders(idUser, page - 1, size);
     }
 
     @Override
@@ -97,7 +96,7 @@ public class UserServiceImpl implements UserService {
         Order order = new Order();
         order.setIdUser(idUser);
         order.setIdCertificate(certificate.get().getId());
-        order.setPaymentDate(date.getCurrentDate());
+        order.setPaymentDate(LocalDateTime.now().toString());
         order.setPrice(certificate.get().getPrice());
         return order;
     }

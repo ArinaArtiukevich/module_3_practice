@@ -6,7 +6,7 @@ public class ParameterAttribute {
 
     public static final String USER_NAME = "arina";
 
-    public static final String TAG_FIELD_ID = "idTag";
+    public static final String TAG_FIELD_ID = "id";
     public static final String TAG_FIELD_NAME = "name";
     public static final String TAG_FIELD_CERTIFICATES = "certificateList";
 
@@ -31,6 +31,8 @@ public class ParameterAttribute {
     public static final String NAME_PARAMETER = "name";
     public static final String DATE_PARAMETER = "date";
     public static final String DIRECTION_PARAMETER = "direction";
+    public static final String PAGE_PARAMETER = "page";
+    public static final String SIZE_PARAMETER = "size";
 
     public static final String SORT_STATEMENT = "sort";
     public static final String ASC_STATEMENT = "ASC";

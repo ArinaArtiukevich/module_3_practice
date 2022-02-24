@@ -34,7 +34,7 @@ public class Tag extends RepresentationModel<Tag> {
     @Column(name = "tag_id")
     @JsonView(View.UI.class)
     @NonNull
-    private Long idTag;
+    private Long id;
 
     @Column(name = "tag_name", unique = true)
     @JsonView(View.UI.class)

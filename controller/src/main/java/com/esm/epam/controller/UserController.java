@@ -37,7 +37,7 @@ public class UserController {
     @GetMapping
     @JsonView(View.UI.class)
     @ResponseStatus(OK)
-    public List<User> getUserList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
+    public List<User> getUserList(@RequestParam("page") @Min(1) int page, @RequestParam("size") @Min(1) int size) {
         List<User> users = userService.getAll(page, size);
         users.forEach(hateoasBuilder::buildFullHateoas);
         return users;
@@ -55,7 +55,7 @@ public class UserController {
     @GetMapping(value = "/{id}/orders")
     @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public List<Order> getUserOrders(@PathVariable("id") @Min(1L) long id, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
+    public List<Order> getUserOrders(@PathVariable("id") @Min(1L) long id, @RequestParam("page") @Min(1) int page, @RequestParam("size") @Min(1) int size) {
         List<Order> orders = userService.getOrders(id, page, size);
         orders.forEach(hateoasBuilder::buildDefaultHateoas);
         return orders;
