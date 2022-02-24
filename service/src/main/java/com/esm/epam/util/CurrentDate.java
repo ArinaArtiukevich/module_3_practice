@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static com.esm.epam.util.ParameterAttribute.DATE_PATTERN;
+
 
 @Component
 public class CurrentDate {
-    public final static String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-
     public String getCurrentDate() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern(DATE_PATTERN);
         LocalDateTime now = LocalDateTime.now();

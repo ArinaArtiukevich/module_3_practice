@@ -8,9 +8,9 @@ import com.esm.epam.exception.ServiceException;
 import org.hibernate.TransientObjectException;
 import org.postgresql.util.PSQLException;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
@@ -24,52 +24,52 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public final ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException exception) {
-        ErrorResponse errorResponse = new ErrorResponse(1, exception.getLocalizedMessage());
-        return new ResponseEntity<>(errorResponse, NOT_FOUND);
+    @ResponseStatus(NOT_FOUND)
+    public final ErrorResponse handleResourceNotFoundException(ResourceNotFoundException exception) {
+        return new ErrorResponse(1, exception.getLocalizedMessage());
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
-    public final ResponseEntity<ErrorResponse> handleDuplicateKeyException(DuplicateKeyException exception) {
-        ErrorResponse errorResponse = new ErrorResponse(2, exception.getLocalizedMessage());
-        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    @ResponseStatus(BAD_REQUEST)
+    public final ErrorResponse handleDuplicateKeyException(DuplicateKeyException exception) {
+        return new ErrorResponse(2, exception.getLocalizedMessage());
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public final ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException exception) {
-        ErrorResponse errorResponse = new ErrorResponse(3, exception.getMessage());
-        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    @ResponseStatus(BAD_REQUEST)
+    public final ErrorResponse handleConstraintViolationException(ConstraintViolationException exception) {
+        return new ErrorResponse(3, exception.getMessage());
     }
 
     @ExceptionHandler(ControllerException.class)
-    public final ResponseEntity<ErrorResponse> handleControllerException(ControllerException exception) {
-        ErrorResponse errorResponse = new ErrorResponse(4, exception.getLocalizedMessage());
-        return new ResponseEntity<>(errorResponse, NOT_ACCEPTABLE);
+    @ResponseStatus(NOT_ACCEPTABLE)
+    public final ErrorResponse handleControllerException(ControllerException exception) {
+        return new ErrorResponse(4, exception.getLocalizedMessage());
     }
 
     @ExceptionHandler(DaoException.class)
-    public final ResponseEntity<ErrorResponse> handleDaoException(DaoException exception) {
-        ErrorResponse errorResponse = new ErrorResponse(5, exception.getLocalizedMessage());
-        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    @ResponseStatus(BAD_REQUEST)
+    public final ErrorResponse handleDaoException(DaoException exception) {
+        return new ErrorResponse(5, exception.getLocalizedMessage());
     }
 
     @ExceptionHandler(ServiceException.class)
-    public final ResponseEntity<ErrorResponse> handleServiceException(ServiceException exception) {
-        ErrorResponse errorResponse = new ErrorResponse(6, exception.getLocalizedMessage());
-        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    @ResponseStatus(BAD_REQUEST)
+    public final ErrorResponse handleServiceException(ServiceException exception) {
+        return new ErrorResponse(6, exception.getLocalizedMessage());
 
     }
 
     @ExceptionHandler(PSQLException.class)
-    public final ResponseEntity<ErrorResponse> handlePSQLException(PSQLException exception) {
-        ErrorResponse errorResponse = new ErrorResponse(7, exception.getLocalizedMessage());
-        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    @ResponseStatus(BAD_REQUEST)
+    public final ErrorResponse handlePSQLException(PSQLException exception) {
+        return new ErrorResponse(7, exception.getLocalizedMessage());
     }
 
     @ExceptionHandler(TransientObjectException.class)
-    public final ResponseEntity<ErrorResponse> handleTransientObjectException(TransientObjectException exception) {
-        ErrorResponse errorResponse = new ErrorResponse(8, exception.getLocalizedMessage());
-        return new ResponseEntity<>(errorResponse, INTERNAL_SERVER_ERROR);
+    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    public final ErrorResponse handleTransientObjectException(TransientObjectException exception) {
+        return new ErrorResponse(8, exception.getLocalizedMessage());
 
     }
 }

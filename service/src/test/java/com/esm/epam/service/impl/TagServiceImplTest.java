@@ -40,35 +40,35 @@ class TagServiceImplTest {
     );
 
     @Test
-    public void testGetAll_positive() {
+    void testGetAll_positive() {
         when(tagDao.getAll(0, 1000)).thenReturn(tags);
         List<Tag> actualTags = tagService.getAll(0, 1000);
         assertEquals(tags, actualTags);
     }
 
     @Test
-    public void testAdd_positive() {
+    void testAdd_positive() {
         when(tagDao.add(newTag)).thenReturn(tag);
         Tag actualTag = tagService.add(newTag);
         assertEquals(tag, actualTag);
     }
 
     @Test
-    public void testGetById_positive() {
+    void testGetById_positive() {
         when(tagDao.getById(1L)).thenReturn(Optional.ofNullable(tag));
         Tag actualTag = tagService.getById(1L);
         assertEquals(tag, actualTag);
     }
 
     @Test
-    public void testDeleteById_positive() {
+    void testDeleteById_positive() {
         when(tagDao.deleteById(2L)).thenReturn(true);
         tagService.deleteById(tags.get(0).getIdTag());
         Mockito.verify(tagDao).deleteById(tags.get(0).getIdTag());
     }
 
     @Test
-    public void testDeleteById() {
+    void testDeleteById() {
         boolean expectedResult = false;
         Long invalidTagId = -1L;
         when(tagDao.deleteById(invalidTagId)).thenReturn(false);

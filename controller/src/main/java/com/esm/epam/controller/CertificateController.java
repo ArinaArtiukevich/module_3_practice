@@ -7,7 +7,6 @@ import com.esm.epam.service.CertificateService;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.Min;
@@ -38,20 +38,22 @@ public class CertificateController {
     private final HateoasBuilder<Certificate> hateoasBuilder;
 
     @GetMapping
+    @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public ResponseEntity<List<Certificate>> getCertificateList(@RequestParam(required = false) MultiValueMap<String, Object> params, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
+    public List<Certificate> getCertificateList(@RequestParam(required = false) MultiValueMap<String, Object> params, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
         validateSortValues(params);
         List<Certificate> certificates = certificateService.getCertificates(params, page, size);
         certificates.forEach(hateoasBuilder::buildFullHateoas);
-        return new ResponseEntity<>(certificates, HttpStatus.OK);
+        return certificates;
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public ResponseEntity<Certificate> getCertificate(@PathVariable("id") @Min(1L) long id) {
+    public Certificate getCertificate(@PathVariable("id") @Min(1L) long id) {
         Certificate certificate = certificateService.getById(id);
         hateoasBuilder.buildFullHateoas(certificate);
-        return new ResponseEntity<>(certificate, HttpStatus.OK);
+        return certificate;
     }
 
 
@@ -84,21 +86,20 @@ public class CertificateController {
     }
 
     @PostMapping
+    @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<Certificate>> addCertificate(@RequestBody Certificate certificate) {
-        ResponseEntity<RepresentationModel<Certificate>> responseEntity;
+    public RepresentationModel<Certificate> addCertificate(@RequestBody Certificate certificate) {
         Certificate addedCertificate = certificateService.add(certificate);
         hateoasBuilder.buildFullHateoas(addedCertificate);
-        responseEntity = new ResponseEntity<>(addedCertificate, OK);
-
-        return responseEntity;
+        return addedCertificate;
     }
 
     @PatchMapping("/{id}")
+    @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<Certificate>> updateCertificate(@PathVariable("id") @Min(1L) long id, @RequestBody Certificate certificate) {
+    public RepresentationModel<Certificate> updateCertificate(@PathVariable("id") @Min(1L) long id, @RequestBody Certificate certificate) {
         Certificate updatedCertificate = certificateService.update(certificate, id);
         hateoasBuilder.buildFullHateoas(updatedCertificate);
-        return new ResponseEntity<>(updatedCertificate, OK);
+        return updatedCertificate;
     }
 }

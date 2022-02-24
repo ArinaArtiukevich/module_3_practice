@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.Min;
@@ -35,34 +36,38 @@ public class UserController {
 
     @GetMapping
     @JsonView(View.UI.class)
-    public ResponseEntity<List<User>> getUserList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
+    @ResponseStatus(OK)
+    public List<User> getUserList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
         List<User> users = userService.getAll(page, size);
         users.forEach(hateoasBuilder::buildFullHateoas);
-        return new ResponseEntity<>(users, OK);
+        return users;
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public ResponseEntity<User> getUser(@PathVariable("id") @Min(1L) long id) {
+    public User getUser(@PathVariable("id") @Min(1L) long id) {
         User user = userService.getById(id);
         hateoasBuilder.buildFullHateoas(user);
-        return new ResponseEntity<>(user, OK);
+        return user;
     }
 
     @GetMapping(value = "/{id}/orders")
+    @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public ResponseEntity<List<Order>> getUserOrders(@PathVariable("id") @Min(1L) long id, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
+    public List<Order> getUserOrders(@PathVariable("id") @Min(1L) long id, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
         List<Order> orders = userService.getOrders(id, page, size);
         orders.forEach(hateoasBuilder::buildDefaultHateoas);
-        return new ResponseEntity<>(orders, OK);
+        return orders;
     }
 
     @PatchMapping("/{id}")
+    @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<User>> updateUser(@PathVariable("id") @Min(1L) long id, @RequestBody User user) {
+    public RepresentationModel<User> updateUser(@PathVariable("id") @Min(1L) long id, @RequestBody User user) {
         User updatedUser = userService.update(user, id);
         hateoasBuilder.buildFullHateoas(updatedUser);
-        return new ResponseEntity<>(updatedUser, OK);
+        return updatedUser;
     }
 
     @GetMapping("/mostWidelyUsedTag")

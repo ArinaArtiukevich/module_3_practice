@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.Min;
@@ -28,25 +29,26 @@ import static org.springframework.http.HttpStatus.OK;
 @Validated
 @AllArgsConstructor
 public class TagController {
-
     private final CRDService<Tag> tagService;
     private final HateoasBuilder<Tag> hateoasBuilder;
 
 
     @GetMapping
+    @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public ResponseEntity<List<Tag>> getTagList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
+    public List<Tag> getTagList(@RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) {
         List<Tag> tags = tagService.getAll(page, size);
         tags.forEach(hateoasBuilder::buildFullHateoas);
-        return new ResponseEntity<>(tags, OK);
+        return tags;
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public ResponseEntity<Tag> getTag(@PathVariable("id") @Min(1L) long id) {
+    public Tag getTag(@PathVariable("id") @Min(1L) long id) {
         Tag tag = tagService.getById(id);
         hateoasBuilder.buildFullHateoas(tag);
-        return new ResponseEntity<>(tag, OK);
+        return tag;
     }
 
     @DeleteMapping("/{id}")
@@ -64,13 +66,12 @@ public class TagController {
     }
 
     @PostMapping
+    @ResponseStatus(OK)
     @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<Tag>> addTag(@RequestBody Tag tag) {
-        ResponseEntity<RepresentationModel<Tag>> responseEntity;
+    public RepresentationModel<Tag> addTag(@RequestBody Tag tag) {
         Tag addedTag = tagService.add(tag);
         hateoasBuilder.buildFullHateoas(addedTag);
-        responseEntity = new ResponseEntity<>(addedTag, OK);
-        return responseEntity;
+        return addedTag;
     }
 
 }

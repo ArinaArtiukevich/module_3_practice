@@ -125,7 +125,7 @@ class CertificateServiceImplTest {
 
 
     @Test
-    public void testAdd_positive() {
+     void testAdd_positive() {
         Long newId = 5L;
         Certificate addedCertificate = Certificate.builder()
                 .id(newId)
@@ -141,21 +141,21 @@ class CertificateServiceImplTest {
 
 
     @Test
-    public void testGetById_positive() {
+     void testGetById_positive() {
         when(certificateDao.getById(1L)).thenReturn(Optional.ofNullable(certificate));
         Certificate actualCertificate = certificateService.getById(1L);
         assertEquals(certificate, actualCertificate);
     }
 
     @Test
-    public void testDeleteById_positive() {
+     void testDeleteById_positive() {
         when(certificateDao.deleteById(2L)).thenReturn(true);
         certificateService.deleteById(certificates.get(0).getId());
         Mockito.verify(certificateDao).deleteById(certificates.get(0).getId());
     }
 
     @Test
-    public void testDeleteById() {
+    void testDeleteById() {
         boolean expectedResult = false;
         Long invalidId = -1L;
         when(certificateDao.deleteById(invalidId)).thenReturn(false);
