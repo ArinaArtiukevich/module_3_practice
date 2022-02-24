@@ -36,7 +36,8 @@ public class CertificatePredicateBuilderImpl implements PredicateBuilder {
     @Override
     public List<Predicate> getPredicates(MultiValueMap<String, Object> params, CriteriaBuilder criteriaBuilder, CriteriaQuery<Certificate> criteriaQuery, Root<Certificate> root) {
         List<Predicate> predicates = new ArrayList<>();
-        for (Map.Entry<String, List<Object>> entry : params.entrySet()) {
+
+        params.entrySet().forEach(entry -> {
             switch (entry.getKey()) {
                 case CERTIFICATE_NAME:
                     addPredicate(params, entry, predicates, criteriaBuilder, root, CERTIFICATE_FIELD_NAME);
@@ -50,7 +51,7 @@ public class CertificatePredicateBuilderImpl implements PredicateBuilder {
                 case SORT_STATEMENT:
                     sortByParameter(params, criteriaBuilder, criteriaQuery, root, entry);
             }
-        }
+        });
         return predicates;
     }
 

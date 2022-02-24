@@ -16,7 +16,6 @@ public class TagServiceImpl implements CRDService<Tag> {
     private final CRDDao<Tag> tagDao;
     private final ServiceValidator<Tag> validator;
 
-
     @Override
     public List<Tag> getAll(int page, int size) {
         return tagDao.getAll(page, size);
@@ -25,7 +24,6 @@ public class TagServiceImpl implements CRDService<Tag> {
     @Override
     public Tag add(Tag tag) {
         return tagDao.add(tag);
-
     }
 
     @Override

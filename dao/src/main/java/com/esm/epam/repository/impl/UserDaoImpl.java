@@ -38,7 +38,6 @@ public class UserDaoImpl implements UserDao {
         criteriaQuery.select(root);
         TypedQuery<User> query = entityManager.createQuery(criteriaQuery);
         return query.setFirstResult(page).setMaxResults(size).getResultList();
-
     }
 
     @Override
@@ -73,9 +72,7 @@ public class UserDaoImpl implements UserDao {
 
         List<Tag> tags = entityManager.createQuery(criteriaQuery).getResultList();
 
-        Optional<Tag> tag = tags.stream().findFirst();
-        return tag;
-
+        return tags.stream().findFirst();
     }
 
     private long getIdUser(EntityManager entityManager, CriteriaBuilder criteriaBuilder) {

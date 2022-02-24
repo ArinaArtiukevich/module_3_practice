@@ -89,7 +89,7 @@ public class CertificateServiceImpl implements CertificateService {
         certificate.get().getTags().stream()
                 .filter(localTag -> idTag == localTag.getIdTag())
                 .findAny()
-                .orElseThrow(() -> new ResourceNotFoundException("Requested tag resource not found id = " + idTag));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Requested tag resource not found id = %d", idTag)));
         return certificateDao.deleteTag(id, idTag);
     }
 
@@ -101,7 +101,7 @@ public class CertificateServiceImpl implements CertificateService {
             nameTags.forEach(name -> {
                 Optional<Tag> tag = tagDao.getByName((String) name);
                 if (!tag.isPresent()) {
-                    throw new ServiceException("Tag with name = " + name + " does not exist");
+                    throw new ServiceException(String.format("Tag with name = %s does not exist", name));
                 }
                 tags.add(tag.get());
             });

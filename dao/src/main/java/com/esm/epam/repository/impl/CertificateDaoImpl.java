@@ -33,7 +33,6 @@ public class CertificateDaoImpl implements CertificateDao {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Certificate> criteriaQuery = criteriaBuilder.createQuery(Certificate.class);
-
         Root<Certificate> root = criteriaQuery.from(Certificate.class);
         List<Predicate> predicates = predicateBuilder.getPredicates(params, criteriaBuilder, criteriaQuery, root);
 

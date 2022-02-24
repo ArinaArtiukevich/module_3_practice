@@ -72,7 +72,6 @@ public class CertificateBuilderImpl implements Builder<Certificate> {
 
     }
 
-
     private void addTagToList(Optional<Tag> tagToBeAdded, List<Tag> tags) {
         if (tagToBeAdded.isPresent() && !tags.contains(tagToBeAdded.get())) {
             tags.add(tagToBeAdded.get());

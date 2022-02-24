@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
                 .map(Order::getIdCertificate)
                 .collect(Collectors.toList());
         if (certificatesId.contains(certificate.get().getId())) {
-            throw new DaoException("User has certificate with id = " + certificate.get().getId());
+            throw new DaoException(String.format("User has certificate with id = %d ", certificate.get().getId()));
         }
     }
 

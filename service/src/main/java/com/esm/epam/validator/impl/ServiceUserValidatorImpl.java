@@ -12,7 +12,7 @@ public class ServiceUserValidatorImpl implements ServiceValidator<User> {
     @Override
     public void validateEntity(Optional<User> user, Long id) {
         if (!user.isPresent()) {
-            throw new ResourceNotFoundException("No such user with id = " + id);
+            throw new ResourceNotFoundException(String.format("No such user with id = %d", id));
         }
     }
 }
