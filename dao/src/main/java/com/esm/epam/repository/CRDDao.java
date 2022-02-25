@@ -13,19 +13,23 @@ public interface CRDDao<T> {
     /**
      * gets all values
      *
+     * @param page is started element
+     * @param size the number of items to be returned
      * @return List with values
      */
-    Optional<List<T>> getAll();
+    List<T> getAll(int page, int size);
 
     /**
      * gets filtered values
      *
      * @param params collection that contains {@link String} as
      *               key and {@link Object} as value
+     * @param page   is started element
+     * @param size   the number of items to be returned
      * @return List with sorted values
      */
-    default Optional<List<T>> getFilteredList(MultiValueMap<String, Object> params) {
-        return getAll();
+    default List<T> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
+        return getAll(page, size);
     }
 
     /**
@@ -34,7 +38,7 @@ public interface CRDDao<T> {
      * @param t the type of element to be added
      * @return element
      */
-    Optional<T> add(T t) throws DaoException;
+    T add(T t) throws DaoException;
 
     /**
      * finds element by id
@@ -43,6 +47,14 @@ public interface CRDDao<T> {
      * @return required element
      */
     Optional<T> getById(Long id) throws DaoException;
+
+    /**
+     * finds element by name
+     *
+     * @param name is required element name
+     * @return required element
+     */
+    Optional<T> getByName(String name) throws DaoException;
 
     /**
      * deletes element by id

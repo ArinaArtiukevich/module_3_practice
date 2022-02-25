@@ -4,6 +4,9 @@ import com.esm.epam.entity.ErrorResponse;
 import com.esm.epam.exception.ControllerException;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.exception.ResourceNotFoundException;
+import com.esm.epam.exception.ServiceException;
+import org.hibernate.TransientObjectException;
+import org.postgresql.util.PSQLException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.validation.ConstraintViolationException;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -47,5 +51,25 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<ErrorResponse> handleDaoException(DaoException exception) {
         ErrorResponse errorResponse = new ErrorResponse(5, exception.getLocalizedMessage());
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ServiceException.class)
+    public final ResponseEntity<ErrorResponse> handleServiceException(ServiceException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(6, exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+
+    }
+
+    @ExceptionHandler(PSQLException.class)
+    public final ResponseEntity<ErrorResponse> handlePSQLException(PSQLException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(7, exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    }
+
+    @ExceptionHandler(TransientObjectException.class)
+    public final ResponseEntity<ErrorResponse> handleTransientObjectException(TransientObjectException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(8, exception.getLocalizedMessage());
+        return new ResponseEntity<>(errorResponse, INTERNAL_SERVER_ERROR);
+
     }
 }

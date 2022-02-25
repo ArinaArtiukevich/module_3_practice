@@ -1,8 +1,7 @@
 package com.esm.epam.service;
 
 import com.esm.epam.exception.DaoException;
-
-import java.util.Optional;
+import com.esm.epam.exception.ResourceNotFoundException;
 
 public interface CRUDService<T> extends CRDService<T> {
     /**
@@ -12,15 +11,6 @@ public interface CRUDService<T> extends CRDService<T> {
      * @param idT of element to be updated
      * @return updated element
      */
-    Optional<T> update(T t, Long idT) throws com.esm.epam.exception.ResourceNotFoundException, DaoException;
-
-    /**
-     * deletes tag by tag's id
-     *
-     * @param id  is id of element with tags
-     * @param idTag is id of tag to be deleted
-     * @return element with updated tags
-     */
-    Optional<T> deleteTag(Long id, Long idTag) throws DaoException;
+    T update(T t, Long idT) throws ResourceNotFoundException, DaoException;
 
 }
