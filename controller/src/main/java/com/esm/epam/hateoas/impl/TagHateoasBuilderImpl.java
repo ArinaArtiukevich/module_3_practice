@@ -1,8 +1,8 @@
 package com.esm.epam.hateoas.impl;
 
 import com.esm.epam.controller.TagController;
-import com.esm.epam.entity.Tag;
 import com.esm.epam.hateoas.HateoasBuilder;
+import com.esm.epam.model.dto.TagDTO;
 import com.esm.epam.model.representation.TagRepresentation;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpMethod;
@@ -18,7 +18,7 @@ public class TagHateoasBuilderImpl implements HateoasBuilder<TagRepresentation> 
     @Override
     public void buildDefaultHateoas(RepresentationModel representationModel) {
         representationModel.add(linkTo(methodOn(TagController.class).getTagList(DEFAULT_PAGE_NUMBER, DEFAULT_SIZE)).withSelfRel().withType(HttpMethod.GET.toString()));
-        representationModel.add(linkTo(methodOn(TagController.class).addTag(new Tag())).withSelfRel().withType(HttpMethod.POST.toString()));
+        representationModel.add(linkTo(methodOn(TagController.class).addTag(new TagDTO())).withSelfRel().withType(HttpMethod.POST.toString()));
     }
 
     @Override

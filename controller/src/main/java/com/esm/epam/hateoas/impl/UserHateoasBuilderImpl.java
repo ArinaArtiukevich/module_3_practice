@@ -1,8 +1,8 @@
 package com.esm.epam.hateoas.impl;
 
 import com.esm.epam.controller.UserController;
-import com.esm.epam.entity.User;
 import com.esm.epam.hateoas.HateoasBuilder;
+import com.esm.epam.model.dto.UserDTO;
 import com.esm.epam.model.representation.UserRepresentation;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpMethod;
@@ -29,6 +29,6 @@ public class UserHateoasBuilderImpl implements HateoasBuilder<UserRepresentation
         buildDefaultHateoas(userRepresentation);
         userRepresentation.add(linkTo(methodOn(UserController.class).getUser(userRepresentation.getId())).withSelfRel().withType(HttpMethod.GET.toString()));
         userRepresentation.add(linkTo(methodOn(UserController.class).getUserOrders(userRepresentation.getId(), DEFAULT_PAGE_NUMBER, DEFAULT_SIZE)).withRel(ORDER).withType(HttpMethod.GET.toString()));
-        userRepresentation.add(linkTo(methodOn(UserController.class).updateUser(userRepresentation.getId(), new User())).withSelfRel().withType(HttpMethod.PATCH.toString()));
+        userRepresentation.add(linkTo(methodOn(UserController.class).updateUser(userRepresentation.getId(), new UserDTO())).withSelfRel().withType(HttpMethod.PATCH.toString()));
     }
 }

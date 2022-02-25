@@ -2,6 +2,8 @@ package com.esm.epam.controller;
 
 import com.esm.epam.entity.Tag;
 import com.esm.epam.hateoas.HateoasBuilder;
+import com.esm.epam.mapper.Mapper;
+import com.esm.epam.model.dto.TagDTO;
 import com.esm.epam.model.representation.TagRepresentation;
 import com.esm.epam.service.CRDService;
 import lombok.AllArgsConstructor;
@@ -34,6 +36,7 @@ public class TagController {
     private final CRDService<Tag> tagService;
     private final HateoasBuilder<TagRepresentation> hateoasBuilder;
     private final RepresentationModelAssembler<Tag, TagRepresentation> tagRepresentationAssembler;
+    private final Mapper<TagDTO, Tag> tagMapper;
 
     @GetMapping
     @ResponseStatus(OK)
@@ -66,8 +69,8 @@ public class TagController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public RepresentationModel<TagRepresentation> addTag(@RequestBody Tag tag) {
-        TagRepresentation addedTagRepresentation = tagRepresentationAssembler.toModel(tagService.add(tag));
+    public RepresentationModel<TagRepresentation> addTag(@RequestBody TagDTO tagDTO) {
+        TagRepresentation addedTagRepresentation = tagRepresentationAssembler.toModel(tagService.add(tagMapper.mapEntity(tagDTO)));
         hateoasBuilder.buildFullHateoas(addedTagRepresentation);
         return addedTagRepresentation;
     }

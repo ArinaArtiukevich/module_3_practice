@@ -18,6 +18,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 import static javax.persistence.CascadeType.MERGE;
@@ -36,9 +37,11 @@ public class Certificate {
     private long id;
 
     @Column(name = "name", unique = true)
+    @NotBlank(message = "Certificate name should not be empty.")
     private String name;
 
     @Column(name = "description")
+    @NotBlank(message = "Certificate description should not be empty.")
     private String description;
 
     @Column(name = "price")

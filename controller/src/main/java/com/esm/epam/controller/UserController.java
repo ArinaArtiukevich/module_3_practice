@@ -4,6 +4,8 @@ import com.esm.epam.entity.Order;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.entity.User;
 import com.esm.epam.hateoas.HateoasBuilder;
+import com.esm.epam.mapper.Mapper;
+import com.esm.epam.model.dto.UserDTO;
 import com.esm.epam.model.representation.OrderRepresentation;
 import com.esm.epam.model.representation.TagRepresentation;
 import com.esm.epam.model.representation.UserRepresentation;
@@ -38,6 +40,7 @@ public class UserController {
     private final RepresentationModelAssembler<User, UserRepresentation> userRepresentationModelAssembler;
     private final RepresentationModelAssembler<Tag, TagRepresentation> tagRepresentationModelAssembler;
     private final RepresentationModelAssembler<Order, OrderRepresentation> orderRepresentationModelAssembler;
+    private final Mapper<UserDTO, User> userMapper;
 
     @GetMapping
     @ResponseStatus(OK)
@@ -65,8 +68,8 @@ public class UserController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(OK)
-    public RepresentationModel<UserRepresentation> updateUser(@PathVariable("id") @Min(1L) long id, @RequestBody User user) {
-        UserRepresentation updatedUserRepresentation = userRepresentationModelAssembler.toModel(userService.update(user, id));
+    public RepresentationModel<UserRepresentation> updateUser(@PathVariable("id") @Min(1L) long id, @RequestBody UserDTO userDTO) {
+        UserRepresentation updatedUserRepresentation = userRepresentationModelAssembler.toModel(userService.update(userMapper.mapEntity(userDTO), id));
         hateoasBuilder.buildFullHateoas(updatedUserRepresentation);
         return updatedUserRepresentation;
     }

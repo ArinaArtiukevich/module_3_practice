@@ -9,7 +9,9 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -19,7 +21,8 @@ public class CertificateRepresentationAssembler implements RepresentationModelAs
 
     @Override
     public CertificateRepresentation toModel(Certificate entity) {
-        List<TagRepresentation> tagsRepresentation = entity.getTags().stream()
+        List<TagRepresentation> tagsRepresentation = Optional.ofNullable(entity.getTags())
+                .orElseGet(Collections::emptyList).stream()
                 .map(tagRepresentationAssembler::toModel)
                 .collect(Collectors.toList());
         return CertificateRepresentation.builder()

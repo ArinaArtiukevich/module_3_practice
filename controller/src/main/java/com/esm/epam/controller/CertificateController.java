@@ -2,6 +2,8 @@ package com.esm.epam.controller;
 
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.hateoas.HateoasBuilder;
+import com.esm.epam.mapper.Mapper;
+import com.esm.epam.model.dto.CertificateDTO;
 import com.esm.epam.model.representation.CertificateRepresentation;
 import com.esm.epam.service.CertificateService;
 import lombok.AllArgsConstructor;
@@ -39,6 +41,7 @@ public class CertificateController {
     private final CertificateService certificateService;
     private final HateoasBuilder<CertificateRepresentation> hateoasBuilder;
     private final RepresentationModelAssembler<Certificate, CertificateRepresentation> certificateRepresentationAssembler;
+    private final Mapper<CertificateDTO, Certificate> certificateMapper;
 
 
     @GetMapping
@@ -88,16 +91,16 @@ public class CertificateController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public RepresentationModel<CertificateRepresentation> addCertificate(@RequestBody Certificate certificate) {
-        CertificateRepresentation addedCertificateRepresentation = certificateRepresentationAssembler.toModel(certificateService.add(certificate));
+    public RepresentationModel<CertificateRepresentation> addCertificate(@RequestBody CertificateDTO certificateDTO) {
+        CertificateRepresentation addedCertificateRepresentation = certificateRepresentationAssembler.toModel(certificateService.add(certificateMapper.mapEntity(certificateDTO)));
         hateoasBuilder.buildFullHateoas(addedCertificateRepresentation);
         return addedCertificateRepresentation;
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(OK)
-    public RepresentationModel<CertificateRepresentation> updateCertificate(@PathVariable("id") @Min(1L) long id, @RequestBody Certificate certificate) {
-        CertificateRepresentation updatedCertificateRepresentation = certificateRepresentationAssembler.toModel(certificateService.update(certificate, id));
+    public RepresentationModel<CertificateRepresentation> updateCertificate(@PathVariable("id") @Min(1L) long id, @RequestBody CertificateDTO certificateDTO) {
+        CertificateRepresentation updatedCertificateRepresentation = certificateRepresentationAssembler.toModel(certificateService.update(certificateMapper.mapEntity(certificateDTO), id));
         hateoasBuilder.buildFullHateoas(updatedCertificateRepresentation);
         return updatedCertificateRepresentation;
     }

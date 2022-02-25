@@ -1,11 +1,10 @@
 package com.esm.epam.entity;
 
 import com.esm.epam.entity.audit.ModificationInformation;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -23,19 +22,17 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @Table(name = "tags")
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id")
-    @NonNull
     private Long id;
 
     @Column(name = "tag_name", unique = true)
     @NotBlank(message = "Tag name should not be empty.")
-    @NonNull
     private String name;
 
     @EqualsAndHashCode.Exclude
