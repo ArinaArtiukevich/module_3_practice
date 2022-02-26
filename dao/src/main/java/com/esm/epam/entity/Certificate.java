@@ -3,6 +3,7 @@ package com.esm.epam.entity;
 import com.esm.epam.entity.audit.ModificationInformation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +29,7 @@ import static javax.persistence.CascadeType.MERGE;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Builder
 @Table(name = "gift_certificates")
 public class Certificate {

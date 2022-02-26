@@ -4,7 +4,6 @@ import com.esm.epam.builder.Builder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
 import com.esm.epam.repository.impl.CertificateDaoImpl;
-import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.impl.ServiceCertificateValidatorImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,14 +38,12 @@ class CertificateServiceImplTest {
     private ServiceCertificateValidatorImpl validator = Mockito.mock(ServiceCertificateValidatorImpl.class);
 
     @Mock
-    private CurrentDate date = new CurrentDate();
-
-    @Mock
     private Builder<Certificate> certificateBuilder;
 
     @InjectMocks
     private CertificateServiceImpl certificateService;
 
+    private final Tag tag = Tag.builder().id(10L).name("indoors").build();
     private final Certificate certificateWithFieldsToBeUpdated = Certificate.builder()
             .name("football")
             .description("playing football")
@@ -64,6 +61,7 @@ class CertificateServiceImplTest {
             .description("skiing in alps")
             .price(200)
             .duration(100)
+            .tags(Collections.singletonList(tag))
             .build();
 
     private final List<Certificate> certificates = Arrays.asList(Certificate.builder()
@@ -79,7 +77,7 @@ class CertificateServiceImplTest {
                     .description("clothing and presents")
                     .price(200)
                     .duration(1)
-                    .tags(Collections.singletonList(new Tag(1L, "tag_paper")))
+                    .tags(Collections.singletonList(Tag.builder().id(1L).name("tag_paper").build()))
                     .build(),
             Certificate.builder()
                     .id(4L)
@@ -87,7 +85,7 @@ class CertificateServiceImplTest {
                     .description("sport")
                     .price(120)
                     .duration(62)
-                    .tags(Collections.singletonList(new Tag(2L, "tag_name")))
+                    .tags(Collections.singletonList(Tag.builder().id(2L).name("tag_name").build()))
                     .build()
     );
 
@@ -98,22 +96,17 @@ class CertificateServiceImplTest {
                 .description("playing football")
                 .price(200)
                 .duration(100)
+                .tags(Collections.singletonList(tag))
                 .build();
-        doAnswer(new Answer<Void>() {
-            public Void answer(InvocationOnMock invocation) {
-                certificate.setName("football");
-                certificate.setDescription("playing football");
-                return null;
-            }
-        }).when(certificateDao).update(certificateWithFieldsToBeUpdated);
+        when(certificateDao.update(expectedCertificate)).thenReturn(expectedCertificate);
         when(certificateDao.getById(1L)).thenReturn(Optional.ofNullable(certificate));
         when(certificateBuilder.buildObject(certificate, certificateWithFieldsToBeUpdated)).thenReturn(expectedCertificate);
-        when(certificateDao.getAll(0, 1000)).thenReturn(Arrays.asList(certificate));
+        when(certificateDao.getAll(0, 1000)).thenReturn(Collections.singletonList(certificate));
 
         certificateService.update(certificateWithFieldsToBeUpdated, 1L);
-        Optional<Certificate> actualCertificate = certificateDao.getById(1L);
+        Certificate actualCertificate = certificateService.update(certificateWithFieldsToBeUpdated, 1L);
 
-        assertEquals(expectedCertificate, actualCertificate.get());
+        assertEquals(expectedCertificate, actualCertificate);
     }
 
     @Test
@@ -126,7 +119,7 @@ class CertificateServiceImplTest {
 
     @Test
      void testAdd_positive() {
-        Long newId = 5L;
+        long newId = 5L;
         Certificate addedCertificate = Certificate.builder()
                 .id(newId)
                 .name("tennis")
@@ -157,7 +150,7 @@ class CertificateServiceImplTest {
     @Test
     void testDeleteById() {
         boolean expectedResult = false;
-        Long invalidId = -1L;
+        long invalidId = -1L;
         when(certificateDao.deleteById(invalidId)).thenReturn(false);
         Boolean actualResult = certificateService.deleteById(invalidId);
 
@@ -192,7 +185,7 @@ class CertificateServiceImplTest {
                 .price(200)
                 .duration(100)
                 .build();
-        certificateBefore.setTags(new LinkedList<>(Collections.singletonList(new Tag(1L, "tag_concert"))));
+        certificateBefore.setTags(new LinkedList<>(Arrays.asList(Tag.builder().id(1L).name("tag_concert").build(), tag)));
         when(certificateDao.getById(1L)).thenReturn(Optional.of(certificateBefore));
         doAnswer(new Answer<Optional<Certificate>>() {
             public Optional<Certificate> answer(InvocationOnMock invocation) {

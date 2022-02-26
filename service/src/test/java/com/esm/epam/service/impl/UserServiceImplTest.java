@@ -7,7 +7,6 @@ import com.esm.epam.entity.audit.ModificationInformation;
 import com.esm.epam.repository.impl.CertificateDaoImpl;
 import com.esm.epam.repository.impl.OrderDaoImpl;
 import com.esm.epam.repository.impl.UserDaoImpl;
-import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.impl.ServiceUserValidatorImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +39,7 @@ class UserServiceImplTest {
                                     .description("clothing and presents")
                                     .price(200)
                                     .duration(1)
-                                    .tags(Arrays.asList(new Tag(1L, "tag_paper"), new Tag(2L, "tag_name")))
+                                    .tags(Arrays.asList(Tag.builder().id(1L).name("tag_paper").build(), Tag.builder().id(2L).name("tag_name").build()))
                                     .build(),
                             Certificate.builder()
                                     .id(2L)
@@ -48,7 +47,7 @@ class UserServiceImplTest {
                                     .description("sport")
                                     .price(120)
                                     .duration(62)
-                                    .tags(Collections.singletonList(new Tag(2L, "tag_name")))
+                                    .tags(Collections.singletonList(Tag.builder().id(2L).name("tag_name").build()))
                                     .build()))
                     .build(),
             User.builder().id(2L).login("viktor").budget(1020).certificates(Arrays.asList(
@@ -58,7 +57,7 @@ class UserServiceImplTest {
                                     .description("sport")
                                     .price(120)
                                     .duration(62)
-                                    .tags(Collections.singletonList(new Tag(2L, "tag_name")))
+                                    .tags(Collections.singletonList(Tag.builder().id(2L).name("tag_name").build()))
                                     .build(),
                             Certificate.builder()
                                     .id(3L)
@@ -90,16 +89,13 @@ class UserServiceImplTest {
     @Mock
     private ServiceUserValidatorImpl validator = Mockito.mock(ServiceUserValidatorImpl.class);
 
-    @Mock
-    private CurrentDate date = new CurrentDate();
-
     @InjectMocks
     private UserServiceImpl userService;
 
     @Test
     void getAll_positive() {
         when(userDao.getAll(0, 1000)).thenReturn(users);
-        List<User> actualUsers = userService.getAll(0, 1000);
+        List<User> actualUsers = userService.getAll(1, 1000);
         assertEquals(users, actualUsers);
     }
 
@@ -116,23 +112,8 @@ class UserServiceImplTest {
     void update() {
         ModificationInformation modificationInformation = new ModificationInformation();
         modificationInformation.setCreatedEntityBy("arina");
-        modificationInformation.setCreationEntityDate(LocalDateTime.of(2022, 2,20,9,10));
+        modificationInformation.setCreationEntityDate(LocalDateTime.of(2022, 2, 20, 9, 10));
         User expectedUser = User.builder().id(2L).login("viktor").budget(820).modificationInformation(modificationInformation).certificates(Arrays.asList(
-                        Certificate.builder()
-                                .id(2L)
-                                .name("hockey")
-                                .description("sport")
-                                .price(120)
-                                .duration(62)
-                                .tags(Collections.singletonList(new Tag(2L, "tag_name")))
-                                .build(),
-                        Certificate.builder()
-                                .id(3L)
-                                .name("snowboarding")
-                                .description("snowboarding school")
-                                .price(10)
-                                .duration(12)
-                                .build(),
                         Certificate.builder()
                                 .id(4L)
                                 .name("skiing")
@@ -154,21 +135,15 @@ class UserServiceImplTest {
             }
         }).when(userDao).getById(2L);
 
-        doAnswer(new Answer<User>() {
-            public User answer(InvocationOnMock invocation) {
-                users.get(1).setBudget(820);
-                users.get(1).setModificationInformation(modificationInformation);
-                return users.get(1);
-            }
-        }).when(userDao).updateBudget(expectedUser);
+        when(userDao.updateBudget(expectedUser)).thenReturn(expectedUser);
         when(certificateDao.getById(4L)).thenReturn(Optional.ofNullable(certificate));
-        User actualUser = userService.update(userToBeUpdated, 2L);
+        User actualUser = userService.update(expectedUser, 2L);
         assertEquals(expectedUser, actualUser);
     }
 
     @Test
     void getMostWidelyUsedTag() {
-        Tag expectedTag = new Tag(2L, "tag_name");
+        Tag expectedTag = Tag.builder().id(2L).name("tag_name").build();
         doReturn(Optional.of(expectedTag)).when(userDao).getMostWidelyUsedTag();
         Optional<Tag> actualTag = userService.getMostWidelyUsedTag();
         assertEquals(expectedTag, actualTag.get());
