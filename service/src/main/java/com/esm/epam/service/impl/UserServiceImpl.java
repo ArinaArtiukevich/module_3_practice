@@ -11,7 +11,7 @@ import com.esm.epam.repository.CertificateDao;
 import com.esm.epam.repository.OrderDao;
 import com.esm.epam.repository.UserDao;
 import com.esm.epam.service.UserService;
-import com.esm.epam.validator.ServiceValidator;
+import com.esm.epam.validator.UserValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final ServiceValidator<User> userValidator;
+    private final UserValidator userValidator;
     private final UserDao userDao;
     private final OrderDao orderDao;
     private final CertificateDao certificateDao;
@@ -46,6 +46,7 @@ public class UserServiceImpl implements UserService {
         Optional<Certificate> certificate;
         Optional<User> userBeforeUpdate = userDao.getById(idUser);
         userValidator.validateEntity(userBeforeUpdate, idUser);
+        userValidator.validateUserToBeUpdated(user);
         certificate = certificateDao.getById(user.getCertificates().get(0).getId());
         if (!certificate.isPresent()) {
             throw new ResourceNotFoundException("No such certificate");
@@ -60,17 +61,6 @@ public class UserServiceImpl implements UserService {
             throw new ServiceException("User does not have enough money");
         }
         return updatedUser;
-    }
-
-    private void prepareUserToBeUpdated(User user, Optional<Certificate> certificate, Optional<User> userBeforeUpdate) {
-        List<Certificate> userCertificates = userBeforeUpdate.get().getCertificates();
-        user.setCertificates(userCertificates);
-        user.setBudget(userBeforeUpdate.get().getBudget() - certificate.get().getPrice());
-        user.setId(userBeforeUpdate.get().getId());
-        user.setLogin(userBeforeUpdate.get().getLogin());
-        user.getModificationInformation().setCreatedEntityBy(userBeforeUpdate.get().getModificationInformation().getCreatedEntityBy());
-        user.getModificationInformation().setCreationEntityDate(userBeforeUpdate.get().getModificationInformation().getCreationEntityDate());
-
     }
 
     @Override
@@ -101,4 +91,15 @@ public class UserServiceImpl implements UserService {
         return order;
     }
 
+
+    private void prepareUserToBeUpdated(User user, Optional<Certificate> certificate, Optional<User> userBeforeUpdate) {
+        List<Certificate> userCertificates = userBeforeUpdate.get().getCertificates();
+        user.setCertificates(userCertificates);
+        user.setBudget(userBeforeUpdate.get().getBudget() - certificate.get().getPrice());
+        user.setId(userBeforeUpdate.get().getId());
+        user.setLogin(userBeforeUpdate.get().getLogin());
+        user.getModificationInformation().setCreatedEntityBy(userBeforeUpdate.get().getModificationInformation().getCreatedEntityBy());
+        user.getModificationInformation().setCreationEntityDate(userBeforeUpdate.get().getModificationInformation().getCreationEntityDate());
+
+    }
 }
