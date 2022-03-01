@@ -11,23 +11,23 @@ public interface CRDService<T> {
     /**
      * gets all values
      *
-     * @param page is started element
+     * @param actualPage is started element
      * @param size the number of items to be returned
      * @return List with values
      */
-    List<T> getAll(int page, int size);
+    List<T> getAll(int actualPage, int size);
 
     /**
      * gets filtered values
      *
      * @param params collection that contains {@link String} as
      *               key and {@link Object} as value
-     * @param page   is started element
+     * @param actualPage   is started element
      * @param size   the number of items to be returned
      * @return List with sorted values
      */
-    default List<T> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
-        return getAll(page, size);
+    default List<T> getFilteredList(MultiValueMap<String, Object> params, int actualPage, int size) {
+        return getAll(actualPage, size);
     }
 
     /**

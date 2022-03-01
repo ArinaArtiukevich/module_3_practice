@@ -43,7 +43,7 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public List<Certificate> getCertificates(MultiValueMap<String, Object> params, int page, int size) {
-        int actualPage = page - 1;
+        int actualPage = (page - 1) * size;
         List<Certificate> certificates;
         if (params.size() == 2) {
             certificates = getAll(actualPage, size);
@@ -54,8 +54,8 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public List<Certificate> getAll(int page, int size) {
-        return certificateDao.getAll(page, size);
+    public List<Certificate> getAll(int actualPage, int size) {
+        return certificateDao.getAll(actualPage, size);
     }
 
     @Override
@@ -77,9 +77,9 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    public List<Certificate> getFilteredList(MultiValueMap<String, Object> params, int page, int size) {
+    public List<Certificate> getFilteredList(MultiValueMap<String, Object> params, int actualPage, int size) {
         prepareTagParam(params);
-        return certificateDao.getFilteredList(params, page, size);
+        return certificateDao.getFilteredList(params, actualPage, size);
     }
 
     @Override

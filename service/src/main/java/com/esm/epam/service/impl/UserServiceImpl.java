@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAll(int page, int size) {
-        return userDao.getAll(page - 1, size);
+        return userDao.getAll((page - 1) * size, size);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Order> getOrders(long idUser, int page, int size) {
-        return orderDao.getLimitedOrders(idUser, page - 1, size);
+        return orderDao.getLimitedOrders(idUser, (page - 1) * size, size);
     }
 
     @Override

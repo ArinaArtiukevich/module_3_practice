@@ -18,7 +18,7 @@ public class TagServiceImpl implements CRDService<Tag> {
 
     @Override
     public List<Tag> getAll(int page, int size) {
-        return tagDao.getAll(page - 1, size);
+        return tagDao.getAll((page - 1) * size, size);
     }
 
     @Override
