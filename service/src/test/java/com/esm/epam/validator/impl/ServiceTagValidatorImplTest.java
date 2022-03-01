@@ -19,7 +19,7 @@ class ServiceTagValidatorImplTest {
 
     @Autowired
     private ServiceTagValidatorImpl tagValidator;
-    private final Tag tag = new Tag(1L, "tag_winter");
+    private static final Tag tag = Tag.builder().id(1L).name("tag_snow").build();
 
     @Test
     void validateEntity_resourceNotFoundException() {
@@ -29,7 +29,7 @@ class ServiceTagValidatorImplTest {
     }
 
     @Test
-    void validateEntity_positive() throws ResourceNotFoundException {
+    void validateEntity_positive() {
         tagValidator.validateEntity(Optional.ofNullable(tag), 1L);
     }
 

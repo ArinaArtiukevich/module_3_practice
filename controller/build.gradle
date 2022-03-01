@@ -12,8 +12,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
-    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.2.19.RELEASE'
-    implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.2.19.RELEASE'
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     implementation group: 'org.hibernate', name: 'hibernate-validator', version: '6.2.1.Final'
     implementation 'org.glassfish:jakarta.el:4.0.2'

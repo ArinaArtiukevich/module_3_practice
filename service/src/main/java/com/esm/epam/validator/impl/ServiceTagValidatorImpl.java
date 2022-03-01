@@ -11,9 +11,9 @@ import java.util.Optional;
 public class ServiceTagValidatorImpl implements ServiceValidator<Tag> {
 
     @Override
-    public void validateEntity(Optional<Tag> tag, Long id) throws ResourceNotFoundException {
+    public void validateEntity(Optional<Tag> tag, Long id) {
         if (!tag.isPresent()) {
-            throw new ResourceNotFoundException("Requested tag resource not found id = " + id);
+            throw new ResourceNotFoundException(String.format("Requested tag resource not found id = %d", id));
         }
     }
 }

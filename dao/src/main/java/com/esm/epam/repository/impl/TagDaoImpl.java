@@ -1,9 +1,8 @@
 package com.esm.epam.repository.impl;
 
 import com.esm.epam.entity.Tag;
-import com.esm.epam.exception.DaoException;
 import com.esm.epam.repository.CRDDao;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -21,13 +20,9 @@ import static com.esm.epam.util.ParameterAttribute.TAG_FIELD_NAME;
 
 
 @Repository
+@AllArgsConstructor
 public class TagDaoImpl implements CRDDao<Tag> {
     private final EntityManagerFactory entityManagerFactory;
-
-    @Autowired
-    public TagDaoImpl(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
-    }
 
     @Override
     public List<Tag> getAll(int page, int size) {
@@ -41,7 +36,7 @@ public class TagDaoImpl implements CRDDao<Tag> {
     }
 
     @Override
-    public Tag add(Tag tag) throws DaoException {
+    public Tag add(Tag tag) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
         entityManager.persist(tag);
@@ -50,7 +45,7 @@ public class TagDaoImpl implements CRDDao<Tag> {
     }
 
     @Override
-    public Optional<Tag> getById(Long id) throws DaoException {
+    public Optional<Tag> getById(long id) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         return Optional.ofNullable(entityManager.find(Tag.class, id));
     }
@@ -72,7 +67,7 @@ public class TagDaoImpl implements CRDDao<Tag> {
     }
 
     @Override
-    public boolean deleteById(Long id) {
+    public boolean deleteById(long id) {
         boolean isDeleted = false;
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

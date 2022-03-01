@@ -1,16 +1,15 @@
 package com.esm.epam.controller;
 
 import com.esm.epam.entity.Certificate;
-import com.esm.epam.entity.View;
-import com.esm.epam.exception.ControllerException;
-import com.esm.epam.exception.DaoException;
-import com.esm.epam.exception.ResourceNotFoundException;
-import com.esm.epam.exception.ServiceException;
 import com.esm.epam.hateoas.HateoasBuilder;
+import com.esm.epam.mapper.Mapper;
+import com.esm.epam.model.dto.CertificateDTO;
+import com.esm.epam.model.representation.CertificateRepresentation;
 import com.esm.epam.service.CertificateService;
-import com.fasterxml.jackson.annotation.JsonView;
+import lombok.AllArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
-import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
@@ -22,102 +21,87 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.List;
 import java.util.Optional;
 
-import static com.esm.epam.validator.ControllerValidator.validateIntToBeUpdated;
 import static com.esm.epam.validator.ControllerValidator.validateSortValues;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 
 @RestController
 @RequestMapping("/certificates")
 @Validated
+@AllArgsConstructor
 public class CertificateController {
-
     private final CertificateService certificateService;
-    private final HateoasBuilder<Certificate> hateoasBuilder;
+    private final HateoasBuilder<CertificateRepresentation> hateoasBuilder;
+    private final RepresentationModelAssembler<Certificate, CertificateRepresentation> certificateRepresentationAssembler;
+    private final Mapper<CertificateDTO, Certificate> certificateMapper;
 
-    public CertificateController(CertificateService certificateService, HateoasBuilder<Certificate> hateoasBuilder) {
-        this.certificateService = certificateService;
-        this.hateoasBuilder = hateoasBuilder;
-    }
 
-    @GetMapping(params = {"page", "size"})
-    @JsonView(View.UI.class)
-    public ResponseEntity<List<Certificate>> getCertificateList(@RequestParam(required = false) MultiValueMap<String, Object> params, @RequestParam("page") @Min(0) int page, @RequestParam("size") @Min(1) int size) throws ResourceNotFoundException, ControllerException, ServiceException, DaoException {
-        List<Certificate> certificates;
-        if (params.size() == 2) {
-            certificates = certificateService.getAll(page, size);
-        } else {
-            validateSortValues(params);
-            certificates = certificateService.getFilteredList(params, page, size);
-        }
-        for (Certificate certificate : certificates) {
-            hateoasBuilder.buildFullHateoas(certificate);
-        }
-        return new ResponseEntity<>(certificates, HttpStatus.OK);
+    @GetMapping
+    @ResponseStatus(OK)
+    public CollectionModel<CertificateRepresentation> getCertificateList(@RequestParam(required = false) MultiValueMap<String, Object> params, @RequestParam("page") @Min(1) int page, @RequestParam("size") @Min(1) int size) {
+        validateSortValues(params);
+        CollectionModel<CertificateRepresentation> certificatesRepresentation = certificateRepresentationAssembler.toCollectionModel(certificateService.getCertificates(params, page, size));
+        certificatesRepresentation.forEach(hateoasBuilder::buildFullHateoas);
+        return certificatesRepresentation;
     }
 
     @GetMapping("/{id}")
-    @JsonView(View.UI.class)
-    public ResponseEntity<Certificate> getCertificate(@PathVariable("id") @Min(1L) Long id) throws ResourceNotFoundException, DaoException, ControllerException, ServiceException {
-        Certificate certificate = certificateService.getById(id);
-        hateoasBuilder.buildFullHateoas(certificate);
-        return new ResponseEntity<>(certificate, HttpStatus.OK);
+    @ResponseStatus(OK)
+    public CertificateRepresentation getCertificate(@PathVariable("id") @Min(1L) long id) {
+        CertificateRepresentation certificateRepresentation = certificateRepresentationAssembler.toModel(certificateService.getById(id));
+        hateoasBuilder.buildFullHateoas(certificateRepresentation);
+        return certificateRepresentation;
     }
 
 
-    @DeleteMapping("/{id}/tags/{tag_id}")
-    @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<Certificate>> deleteTagCertificate(@PathVariable("id") @Min(1L) Long id, @PathVariable("tag_id") @Min(1L) Long idTag) throws DaoException, ControllerException, ServiceException, ResourceNotFoundException {
-        ResponseEntity<RepresentationModel<Certificate>> responseEntity;
-        Optional<Certificate> addedCertificate = certificateService.deleteTag(id, idTag);
-        if (addedCertificate.isPresent()) {
-            hateoasBuilder.buildFullHateoas(addedCertificate.get());
-            responseEntity = new ResponseEntity<>(addedCertificate.get(), OK);
+    @DeleteMapping("/{id}/tags/{tagId}")
+    public ResponseEntity<RepresentationModel<CertificateRepresentation>> deleteTagCertificate(@PathVariable("id") @Min(1L) long id, @PathVariable("tagId") @Min(1L) long tagId) {
+        ResponseEntity<RepresentationModel<CertificateRepresentation>> responseEntity;
+        Optional<Certificate> updatedCertificate = certificateService.deleteTag(id, tagId);
+        if (updatedCertificate.isPresent()) {
+            CertificateRepresentation updatedCertificateRepresentation = certificateRepresentationAssembler.toModel(updatedCertificate.get());
+            hateoasBuilder.buildFullHateoas(updatedCertificateRepresentation);
+            responseEntity = new ResponseEntity<>(updatedCertificateRepresentation, NO_CONTENT);
         } else {
-            responseEntity = ResponseEntity.noContent().build();
+            responseEntity = ResponseEntity.notFound().build();
         }
         return responseEntity;
     }
 
     @DeleteMapping("/{id}")
-    @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<Certificate>> deleteCertificate(@PathVariable("id") @Min(1L) Long id) throws ResourceNotFoundException, ControllerException, ServiceException, DaoException {
-        ResponseEntity<RepresentationModel<Certificate>> responseEntity;
+    public ResponseEntity<RepresentationModel<CertificateRepresentation>> deleteCertificate(@PathVariable("id") @Min(1L) long id) {
+        ResponseEntity<RepresentationModel<CertificateRepresentation>> responseEntity;
         if (certificateService.deleteById(id)) {
-            RepresentationModel<Certificate> representationModel = new RepresentationModel<>();
+            RepresentationModel<CertificateRepresentation> representationModel = new RepresentationModel<>();
             hateoasBuilder.buildDefaultHateoas(representationModel);
-            responseEntity = new ResponseEntity<>(representationModel, OK);
+            responseEntity = new ResponseEntity<>(representationModel, NO_CONTENT);
         } else {
-            responseEntity = ResponseEntity.noContent().build();
+            responseEntity = ResponseEntity.notFound().build();
         }
         return responseEntity;
     }
 
     @PostMapping
-    @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<Certificate>> addCertificate(@Valid @RequestBody Certificate certificate) throws DaoException, ControllerException, ServiceException, ResourceNotFoundException {
-        ResponseEntity<RepresentationModel<Certificate>> responseEntity;
-        Certificate addedCertificate = certificateService.add(certificate);
-        hateoasBuilder.buildFullHateoas(addedCertificate);
-        responseEntity = new ResponseEntity<>(addedCertificate, OK);
-
-        return responseEntity;
+    @ResponseStatus(CREATED)
+    public RepresentationModel<CertificateRepresentation> addCertificate(@RequestBody CertificateDTO certificateDTO) {
+        CertificateRepresentation addedCertificateRepresentation = certificateRepresentationAssembler.toModel(certificateService.add(certificateMapper.mapEntity(certificateDTO)));
+        hateoasBuilder.buildFullHateoas(addedCertificateRepresentation);
+        return addedCertificateRepresentation;
     }
 
     @PatchMapping("/{id}")
-    @JsonView(View.UI.class)
-    public ResponseEntity<RepresentationModel<Certificate>> updateCertificate(@PathVariable("id") @Min(1L) Long id, @RequestBody Certificate certificate) throws ControllerException, ResourceNotFoundException, DaoException, ServiceException {
-        validateIntToBeUpdated(certificate.getDuration());
-        validateIntToBeUpdated(certificate.getPrice());
-        Certificate updatedCertificate = certificateService.update(certificate, id);
-        hateoasBuilder.buildFullHateoas(updatedCertificate);
-        return new ResponseEntity<>(updatedCertificate, OK);
+    @ResponseStatus(OK)
+    public RepresentationModel<CertificateRepresentation> updateCertificate(@PathVariable("id") @Min(1L) long id, @RequestBody CertificateDTO certificateDTO) {
+        CertificateRepresentation updatedCertificateRepresentation = certificateRepresentationAssembler.toModel(certificateService.update(certificateMapper.mapEntity(certificateDTO), id));
+        hateoasBuilder.buildFullHateoas(updatedCertificateRepresentation);
+        return updatedCertificateRepresentation;
     }
 }

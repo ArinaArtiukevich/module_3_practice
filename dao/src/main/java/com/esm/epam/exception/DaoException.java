@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class DaoException extends Exception {
+public class DaoException extends RuntimeException {
     private String message;
 }

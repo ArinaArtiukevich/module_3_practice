@@ -3,11 +3,7 @@ package com.esm.epam.service.impl;
 import com.esm.epam.builder.Builder;
 import com.esm.epam.entity.Certificate;
 import com.esm.epam.entity.Tag;
-import com.esm.epam.exception.DaoException;
-import com.esm.epam.exception.ResourceNotFoundException;
-import com.esm.epam.exception.ServiceException;
 import com.esm.epam.repository.impl.CertificateDaoImpl;
-import com.esm.epam.util.CurrentDate;
 import com.esm.epam.validator.impl.ServiceCertificateValidatorImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,20 +38,18 @@ class CertificateServiceImplTest {
     private ServiceCertificateValidatorImpl validator = Mockito.mock(ServiceCertificateValidatorImpl.class);
 
     @Mock
-    private CurrentDate date = new CurrentDate();
-
-    @Mock
     private Builder<Certificate> certificateBuilder;
 
     @InjectMocks
     private CertificateServiceImpl certificateService;
 
+    private final Tag tag = Tag.builder().id(10L).name("indoors").build();
     private final Certificate certificateWithFieldsToBeUpdated = Certificate.builder()
             .name("football")
             .description("playing football")
             .build();
     private final Certificate newCertificate = Certificate.builder()
-            .id(null)
+            .id(5L)
             .name("tennis")
             .description("playing tennis")
             .price(204)
@@ -67,6 +61,7 @@ class CertificateServiceImplTest {
             .description("skiing in alps")
             .price(200)
             .duration(100)
+            .tags(Collections.singletonList(tag))
             .build();
 
     private final List<Certificate> certificates = Arrays.asList(Certificate.builder()
@@ -82,7 +77,7 @@ class CertificateServiceImplTest {
                     .description("clothing and presents")
                     .price(200)
                     .duration(1)
-                    .tags(Collections.singletonList(new Tag(1L, "tag_paper")))
+                    .tags(Collections.singletonList(Tag.builder().id(1L).name("tag_paper").build()))
                     .build(),
             Certificate.builder()
                     .id(4L)
@@ -90,37 +85,32 @@ class CertificateServiceImplTest {
                     .description("sport")
                     .price(120)
                     .duration(62)
-                    .tags(Collections.singletonList(new Tag(2L, "tag_name")))
+                    .tags(Collections.singletonList(Tag.builder().id(2L).name("tag_name").build()))
                     .build()
     );
 
     @Test
-    void testUpdate_positive() throws DaoException, ResourceNotFoundException {
+    void testUpdate_positive() {
         Certificate expectedCertificate = Certificate.builder().id(1L)
                 .name("football")
                 .description("playing football")
                 .price(200)
                 .duration(100)
+                .tags(Collections.singletonList(tag))
                 .build();
-        doAnswer(new Answer<Void>() {
-            public Void answer(InvocationOnMock invocation) {
-                certificate.setName("football");
-                certificate.setDescription("playing football");
-                return null;
-            }
-        }).when(certificateDao).update(certificateWithFieldsToBeUpdated);
+        when(certificateDao.update(expectedCertificate)).thenReturn(expectedCertificate);
         when(certificateDao.getById(1L)).thenReturn(Optional.ofNullable(certificate));
         when(certificateBuilder.buildObject(certificate, certificateWithFieldsToBeUpdated)).thenReturn(expectedCertificate);
-        when(certificateDao.getAll(0, 1000)).thenReturn(Arrays.asList(certificate));
+        when(certificateDao.getAll(0, 1000)).thenReturn(Collections.singletonList(certificate));
 
         certificateService.update(certificateWithFieldsToBeUpdated, 1L);
-        Optional<Certificate> actualCertificate = certificateDao.getById(1L);
+        Certificate actualCertificate = certificateService.update(certificateWithFieldsToBeUpdated, 1L);
 
-        assertEquals(expectedCertificate, actualCertificate.get());
+        assertEquals(expectedCertificate, actualCertificate);
     }
 
     @Test
-    void testGetAll_positive() throws ResourceNotFoundException {
+    void testGetAll_positive() {
         when(certificateDao.getAll(0, 1000)).thenReturn(certificates);
         List<Certificate> actualCertificates = certificateService.getAll(0, 1000);
         assertEquals(certificates, actualCertificates);
@@ -128,8 +118,8 @@ class CertificateServiceImplTest {
 
 
     @Test
-    public void testAdd_positive() throws DaoException {
-        Long newId = 5L;
+     void testAdd_positive() {
+        long newId = 5L;
         Certificate addedCertificate = Certificate.builder()
                 .id(newId)
                 .name("tennis")
@@ -144,23 +134,23 @@ class CertificateServiceImplTest {
 
 
     @Test
-    public void testGetById_positive() throws ResourceNotFoundException, DaoException {
+     void testGetById_positive() {
         when(certificateDao.getById(1L)).thenReturn(Optional.ofNullable(certificate));
         Certificate actualCertificate = certificateService.getById(1L);
         assertEquals(certificate, actualCertificate);
     }
 
     @Test
-    public void testDeleteById_positive() {
+     void testDeleteById_positive() {
         when(certificateDao.deleteById(2L)).thenReturn(true);
         certificateService.deleteById(certificates.get(0).getId());
         Mockito.verify(certificateDao).deleteById(certificates.get(0).getId());
     }
 
     @Test
-    public void testDeleteById() {
+    void testDeleteById() {
         boolean expectedResult = false;
-        Long invalidId = -1L;
+        long invalidId = -1L;
         when(certificateDao.deleteById(invalidId)).thenReturn(false);
         Boolean actualResult = certificateService.deleteById(invalidId);
 
@@ -169,7 +159,7 @@ class CertificateServiceImplTest {
     }
 
     @Test
-    void testGetFilteredList_filterByPartName() throws ResourceNotFoundException, ServiceException, DaoException {
+    void testGetFilteredList_filterByPartName() {
         String partName = "ing";
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("name", partName);
@@ -187,7 +177,7 @@ class CertificateServiceImplTest {
     }
 
     @Test
-    void testDeleteTag_positive() throws DaoException, ResourceNotFoundException {
+    void testDeleteTag_positive() {
         Certificate certificateBefore = Certificate.builder()
                 .id(1L)
                 .name("skiing")
@@ -195,7 +185,7 @@ class CertificateServiceImplTest {
                 .price(200)
                 .duration(100)
                 .build();
-        certificateBefore.setTags(new LinkedList<>(Collections.singletonList(new Tag(1L, "tag_concert"))));
+        certificateBefore.setTags(new LinkedList<>(Arrays.asList(Tag.builder().id(1L).name("tag_concert").build(), tag)));
         when(certificateDao.getById(1L)).thenReturn(Optional.of(certificateBefore));
         doAnswer(new Answer<Optional<Certificate>>() {
             public Optional<Certificate> answer(InvocationOnMock invocation) {

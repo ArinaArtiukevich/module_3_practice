@@ -1,14 +1,12 @@
 package com.esm.epam.entity;
 
 import com.esm.epam.entity.audit.ModificationInformation;
-import com.fasterxml.jackson.annotation.JsonView;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -22,29 +20,25 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Entity
-@Table(name = "tags")
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
-public class Tag extends RepresentationModel<Tag> {
+@Builder
+@Table(name = "tags")
+public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id")
-    @JsonView(View.UI.class)
-    @NonNull
-    private Long idTag;
+    private Long id;
 
     @Column(name = "tag_name", unique = true)
-    @JsonView(View.UI.class)
     @NotBlank(message = "Tag name should not be empty.")
-    @NonNull
     private String name;
 
     @EqualsAndHashCode.Exclude
     @ManyToMany(mappedBy = "tags")
-    @JsonView(View.REST.class)
     private List<Certificate> certificateList;
 
     @Embedded

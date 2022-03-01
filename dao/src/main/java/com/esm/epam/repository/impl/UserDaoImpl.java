@@ -5,7 +5,7 @@ import com.esm.epam.entity.Tag;
 import com.esm.epam.entity.User;
 import com.esm.epam.exception.DaoException;
 import com.esm.epam.repository.UserDao;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -24,16 +24,10 @@ import static com.esm.epam.util.ParameterAttribute.TAG_FIELD_CERTIFICATES;
 import static com.esm.epam.util.ParameterAttribute.TAG_FIELD_ID;
 
 @Repository
-
-
+@AllArgsConstructor
 public class UserDaoImpl implements UserDao {
 
     private final EntityManagerFactory entityManagerFactory;
-
-    @Autowired
-    public UserDaoImpl(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
-    }
 
     @Override
     public List<User> getAll(int page, int size) {
@@ -44,11 +38,10 @@ public class UserDaoImpl implements UserDao {
         criteriaQuery.select(root);
         TypedQuery<User> query = entityManager.createQuery(criteriaQuery);
         return query.setFirstResult(page).setMaxResults(size).getResultList();
-
     }
 
     @Override
-    public Optional<User> getById(Long id) throws DaoException {
+    public Optional<User> getById(long id) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         return Optional.ofNullable(entityManager.find(User.class, id));
     }
@@ -63,11 +56,10 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public Optional<Tag> getMostWidelyUsedTag() throws DaoException {
-        Optional<Tag> tag = Optional.empty();
+    public Optional<Tag> getMostWidelyUsedTag() {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        Long idUser = getIdUser(entityManager, criteriaBuilder);
+        long idUser = getIdUser(entityManager, criteriaBuilder);
 
         CriteriaQuery<Tag> criteriaQuery = criteriaBuilder.createQuery(Tag.class);
         Root<Tag> root = criteriaQuery.from(Tag.class);
@@ -80,26 +72,19 @@ public class UserDaoImpl implements UserDao {
 
         List<Tag> tags = entityManager.createQuery(criteriaQuery).getResultList();
 
-        if (tags.size() > 0) {
-            tag = Optional.of(tags.get(0));
-        }
-        return tag;
-
+        return tags.stream().findFirst();
     }
 
-    private Long getIdUser(EntityManager entityManager, CriteriaBuilder criteriaBuilder) throws DaoException {
-        Long idUser;
+    private long getIdUser(EntityManager entityManager, CriteriaBuilder criteriaBuilder) {
+        long idUser;
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Order> root = criteriaQuery.from(Order.class);
         criteriaQuery.select(root.get(ORDER_FIELD_USER_ID));
         criteriaQuery.orderBy(criteriaBuilder.desc(criteriaBuilder.sum(root.get(ORDER_FIELD_PRICE))));
         criteriaQuery.groupBy(root.get(ORDER_FIELD_USER_ID));
         List<Long> idUsers = entityManager.createQuery(criteriaQuery).getResultList();
-        if (idUsers.size() > 0) {
-            idUser = idUsers.get(0);
-        } else {
-            throw new DaoException("Could not find tag");
-        }
+
+        idUser = idUsers.stream().findFirst().orElseThrow(() -> new DaoException("Could not find tag"));
         return idUser;
     }
 }

@@ -2,7 +2,7 @@ package com.esm.epam.builder.impl;
 
 import com.esm.epam.builder.PredicateBuilder;
 import com.esm.epam.entity.Certificate;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.esm.epam.exception.DaoException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 
@@ -13,8 +13,8 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-import static com.esm.epam.util.ParameterAttribute.ASC_STATEMENT;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_DESCRIPTION;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_FIELD_DATE;
 import static com.esm.epam.util.ParameterAttribute.CERTIFICATE_FIELD_DESCRIPTION;
@@ -25,19 +25,20 @@ import static com.esm.epam.util.ParameterAttribute.DATE_PARAMETER;
 import static com.esm.epam.util.ParameterAttribute.DESC_STATEMENT;
 import static com.esm.epam.util.ParameterAttribute.DIRECTION_PARAMETER;
 import static com.esm.epam.util.ParameterAttribute.NAME_PARAMETER;
+import static com.esm.epam.util.ParameterAttribute.PAGE_PARAMETER;
 import static com.esm.epam.util.ParameterAttribute.PERCENT_SYMBOL;
+import static com.esm.epam.util.ParameterAttribute.SIZE_PARAMETER;
 import static com.esm.epam.util.ParameterAttribute.SORT_STATEMENT;
 import static com.esm.epam.util.ParameterAttribute.TAG;
 
-
 @Component
-@Qualifier
-public class CertificatePredicateBuilderImpl implements PredicateBuilder<Certificate> {
+public class CertificatePredicateBuilderImpl implements PredicateBuilder {
 
     @Override
     public List<Predicate> getPredicates(MultiValueMap<String, Object> params, CriteriaBuilder criteriaBuilder, CriteriaQuery<Certificate> criteriaQuery, Root<Certificate> root) {
         List<Predicate> predicates = new ArrayList<>();
-        for (Map.Entry<String, List<Object>> entry : params.entrySet()) {
+
+        params.entrySet().forEach(entry -> {
             switch (entry.getKey()) {
                 case CERTIFICATE_NAME:
                     addPredicate(params, entry, predicates, criteriaBuilder, root, CERTIFICATE_FIELD_NAME);
@@ -50,48 +51,40 @@ public class CertificatePredicateBuilderImpl implements PredicateBuilder<Certifi
                     break;
                 case SORT_STATEMENT:
                     sortByParameter(params, criteriaBuilder, criteriaQuery, root, entry);
+                    break;
+                default:
+                    if (!Objects.equals(entry.getKey(), DIRECTION_PARAMETER) && !Objects.equals(entry.getKey(), PAGE_PARAMETER) && !Objects.equals(entry.getKey(), SIZE_PARAMETER)) {
+                        throw new DaoException("Invalid filter key.");
+                    }
+                    break;
             }
-        }
+        });
         return predicates;
     }
 
     private void addTagPredicate(CriteriaBuilder criteriaBuilder, Root<Certificate> root, List<Predicate> predicates, Map.Entry<String, List<Object>> entry) {
-        for (Object tag : entry.getValue()) {
-            predicates.add(
-                    criteriaBuilder.isMember(tag, root.get(CERTIFICATE_FIELD_TAGS)
-                    ));
-        }
+        entry.getValue().forEach(tag -> predicates.add(criteriaBuilder.isMember(tag, root.get(CERTIFICATE_FIELD_TAGS))));
     }
 
     private void addPredicate(MultiValueMap<String, Object> params, Map.Entry<String, List<Object>> entry, List<Predicate> predicates, CriteriaBuilder criteriaBuilder, Root<Certificate> root, String certificateField) {
-        if (params.get(entry.getKey()).size() > 0) {
+        params.get(entry.getKey()).forEach((value) -> {
             predicates.add(
-                    criteriaBuilder.like(root.get(certificateField), PERCENT_SYMBOL + params.get(entry.getKey()).get(0) + PERCENT_SYMBOL
-                    ));
-        }
+                    criteriaBuilder.like(root.get(certificateField), PERCENT_SYMBOL + value + PERCENT_SYMBOL));
+        });
     }
 
     private void sortByParameter(MultiValueMap<String, Object> params, CriteriaBuilder criteriaBuilder, CriteriaQuery<Certificate> criteriaQuery, Root<Certificate> root, Map.Entry<String, List<Object>> entry) {
-        String direction = ASC_STATEMENT;
-        if (params.containsKey(DIRECTION_PARAMETER)) {
-            if (((String) params.get(DIRECTION_PARAMETER).get(0)).equalsIgnoreCase(DESC_STATEMENT)) {
-                direction = DESC_STATEMENT;
+        entry.getValue().stream().findFirst().ifPresent(value -> {
+            if (NAME_PARAMETER.equals(value)) {
+                sortByDirectionAndParameter(params, criteriaBuilder, criteriaQuery, root, CERTIFICATE_FIELD_NAME);
+            } else if (DATE_PARAMETER.equals(value)) {
+                sortByDirectionAndParameter(params, criteriaBuilder, criteriaQuery, root, CERTIFICATE_FIELD_DATE);
             }
-        }
-        if (entry.getValue().size() > 0) {
-            switch (entry.getValue().get(0).toString()) {
-                case NAME_PARAMETER:
-                    sortByDirectionAndParameter(criteriaBuilder, criteriaQuery, root, direction, CERTIFICATE_FIELD_NAME);
-                    break;
-                case DATE_PARAMETER:
-                    sortByDirectionAndParameter(criteriaBuilder, criteriaQuery, root, direction, CERTIFICATE_FIELD_DATE);
-                    break;
-            }
-        }
+        });
     }
 
-    private void sortByDirectionAndParameter(CriteriaBuilder criteriaBuilder, CriteriaQuery<Certificate> criteriaQuery, Root<Certificate> root, String direction, String parameter) {
-        if (direction.equals(DESC_STATEMENT)) {
+    private void sortByDirectionAndParameter(MultiValueMap<String, Object> params, CriteriaBuilder criteriaBuilder, CriteriaQuery<Certificate> criteriaQuery, Root<Certificate> root, String parameter) {
+        if (params.containsKey(DIRECTION_PARAMETER) && ((String) params.get(DIRECTION_PARAMETER).get(0)).equalsIgnoreCase(DESC_STATEMENT)) {
             criteriaQuery.orderBy(criteriaBuilder.desc(root.get(parameter)));
         } else {
             criteriaQuery.orderBy(criteriaBuilder.asc(root.get(parameter)));

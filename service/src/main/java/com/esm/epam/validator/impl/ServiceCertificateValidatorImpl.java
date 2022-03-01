@@ -10,9 +10,9 @@ import java.util.Optional;
 @Component
 public class ServiceCertificateValidatorImpl implements ServiceValidator<Certificate> {
     @Override
-    public void validateEntity(Optional<Certificate> certificate, Long id) throws ResourceNotFoundException {
+    public void validateEntity(Optional<Certificate> certificate, Long id) {
         if (!certificate.isPresent()) {
-            throw new ResourceNotFoundException("Requested certificate resource not found id = " + id);
+            throw new ResourceNotFoundException(String.format("Requested certificate resource not found id = %d ", id));
         }
     }
 }

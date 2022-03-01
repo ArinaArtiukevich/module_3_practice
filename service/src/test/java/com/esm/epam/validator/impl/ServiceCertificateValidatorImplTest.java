@@ -35,7 +35,7 @@ class ServiceCertificateValidatorImplTest {
     }
 
     @Test
-    void testValidateEntity_positive() throws ResourceNotFoundException {
+    void testValidateEntity_positive() {
         certificateValidator.validateEntity(Optional.ofNullable(certificate), 1L);
     }
 }

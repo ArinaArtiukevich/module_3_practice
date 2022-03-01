@@ -26,7 +26,7 @@ class ServiceUserValidatorImplTest {
                                     .description("clothing and presents")
                                     .price(200)
                                     .duration(1)
-                                    .tags(Arrays.asList(new Tag(1L, "tag_paper"), new Tag(2L, "tag_name")))
+                                    .tags(Arrays.asList(Tag.builder().id(1L).name("tag_paper").build(), Tag.builder().id(2L).name("tag_name").build()))
             .build(),
                             Certificate.builder()
                                     .id(2L)
@@ -34,7 +34,7 @@ class ServiceUserValidatorImplTest {
                                     .description("sport")
                                     .price(120)
                                     .duration(62)
-                                    .tags(Collections.singletonList(new Tag(2L, "tag_name")))
+                                    .tags(Collections.singletonList(Tag.builder().id(2L).name("tag_name").build()))
             .build()))
             .build();
 
@@ -50,7 +50,7 @@ class ServiceUserValidatorImplTest {
     }
 
     @Test
-    void validateUser_positive() throws ResourceNotFoundException {
+    void validateUser_positive() {
         userValidator.validateEntity(Optional.ofNullable(user), 1L);
     }
 

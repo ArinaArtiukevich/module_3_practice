@@ -1,31 +1,34 @@
 package com.esm.epam.hateoas.impl;
 
 import com.esm.epam.controller.UserController;
-import com.esm.epam.entity.User;
-import com.esm.epam.exception.ControllerException;
-import com.esm.epam.exception.DaoException;
-import com.esm.epam.exception.ResourceNotFoundException;
-import com.esm.epam.exception.ServiceException;
 import com.esm.epam.hateoas.HateoasBuilder;
+import com.esm.epam.model.dto.UserDTO;
+import com.esm.epam.model.representation.UserRepresentation;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
+import static com.esm.epam.util.ParameterAttribute.DEFAULT_PAGE_NUMBER;
+import static com.esm.epam.util.ParameterAttribute.DEFAULT_SIZE;
+import static com.esm.epam.util.ParameterAttribute.MOST_WIDELY_USED_TAG;
+import static com.esm.epam.util.ParameterAttribute.ORDER;
+import static com.esm.epam.util.ParameterAttribute.TAG;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class UserHateoasBuilderImpl implements HateoasBuilder<User> {
+public class UserHateoasBuilderImpl implements HateoasBuilder<UserRepresentation> {
     @Override
-    public void buildDefaultHateoas(RepresentationModel model) throws ControllerException, ServiceException, ResourceNotFoundException, DaoException {
-        model.add(linkTo(methodOn(UserController.class).getUserList(0, 5)).withSelfRel().withType("GET"));
-        model.add(linkTo(methodOn(UserController.class).getMostWidelyUsedTag()).slash("mostWidelyUsedTag").withRel("Tag").withType("GET"));
+    public void buildDefaultHateoas(RepresentationModel model) {
+        model.add(linkTo(methodOn(UserController.class).getUserList(DEFAULT_PAGE_NUMBER, DEFAULT_SIZE)).withSelfRel().withType(HttpMethod.GET.toString()));
+        model.add(linkTo(methodOn(UserController.class).getMostWidelyUsedTag()).slash(MOST_WIDELY_USED_TAG).withRel(TAG).withType(HttpMethod.GET.toString()));
     }
 
     @Override
-    public void buildFullHateoas(User user) throws ResourceNotFoundException, DaoException, ControllerException, ServiceException {
-        buildDefaultHateoas(user);
-        user.add(linkTo(methodOn(UserController.class).getUser(user.getId())).withSelfRel().withType("GET"));
-        user.add(linkTo(methodOn(UserController.class).getUserOrders(user.getId(), 1, 5)).withRel("Order").withType("GET"));
-        user.add(linkTo(methodOn(UserController.class).updateUser(user.getId(), new User())).withSelfRel().withType("PATCH"));
+    public void buildFullHateoas(UserRepresentation userRepresentation) {
+        buildDefaultHateoas(userRepresentation);
+        userRepresentation.add(linkTo(methodOn(UserController.class).getUser(userRepresentation.getId())).withSelfRel().withType(HttpMethod.GET.toString()));
+        userRepresentation.add(linkTo(methodOn(UserController.class).getUserOrders(userRepresentation.getId(), DEFAULT_PAGE_NUMBER, DEFAULT_SIZE)).withRel(ORDER).withType(HttpMethod.GET.toString()));
+        userRepresentation.add(linkTo(methodOn(UserController.class).updateUser(userRepresentation.getId(), new UserDTO())).withSelfRel().withType(HttpMethod.PATCH.toString()));
     }
 }

@@ -4,13 +4,23 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ParameterAttribute {
-    public final static String TAG = "tag";
-    public final static String NAME = "name";
-    public final static String DESCRIPTION = "description";
-    public final static String SORT = "sort";
-    public final static String DIRECTION = "direction";
-    public final static String PAGE = "page";
-    public final static String SIZE = "size";
+    private ParameterAttribute() {
+    }
 
-    public final static List<String> SORT_KEYS = Arrays.asList(TAG, NAME, DESCRIPTION, SORT, DIRECTION, PAGE, SIZE);
+    public static final String TAG_SORT = "tag";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String SORT = "sort";
+    public static final String DIRECTION = "direction";
+    public static final String PAGE = "page";
+    public static final String SIZE = "size";
+
+    public static final String ORDER = "Order";
+    public static final String TAG = "Tag";
+    public static final String MOST_WIDELY_USED_TAG = "mostWidelyUsedTag";
+
+    public static final int DEFAULT_PAGE_NUMBER = 1;
+    public static final int DEFAULT_SIZE = 5;
+
+    public static final List<String> SORT_KEYS = Arrays.asList(TAG_SORT, NAME, DESCRIPTION, SORT, DIRECTION, PAGE, SIZE);
 }
